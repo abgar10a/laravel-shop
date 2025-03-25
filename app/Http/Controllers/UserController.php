@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserTypes;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,7 +43,7 @@ class UserController extends Controller
             $incomingFields = $request->validate([
                 'name' => ['required', 'min:3', 'max:10', Rule::unique('users', 'name')],
                 'email' => ['required', 'email', Rule::unique('users', 'email')],
-                'user_type' => ['required', Rule::in(['I', 'B'])],
+                'user_type' => ['required', Rule::in(UserTypes::cases())],
                 'address' => ['required', 'string', 'max:255'],
                 'city' => ['required', 'string', 'max:100'],
                 'postal_code' => ['required', 'string', 'max:20'],

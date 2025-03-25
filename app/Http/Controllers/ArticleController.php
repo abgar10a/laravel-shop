@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\ResponseHelper;
 use App\Models\Article;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreArticleRequest;
-use App\Http\Requests\UpdateArticleRequest;
 use App\Services\ArticleService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -14,15 +12,16 @@ class ArticleController extends Controller
 {
     private $articleService;
 
-    public function __construct(ArticleService $articleService)
+    public function __construct()
     {
-        $this->articleService = $articleService;
+        $this->articleService = app(ArticleService::class);
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $articles = Article::all();
-        return response()->json($articles);
+        $page = $request->has('page') ? (int)$request->query('page') : 0;
+        $articles = $this->articleService->getArticles($page);
+        return ResponseHelper::success('Articles', $articles);
     }
 
     public function create()
@@ -32,52 +31,94 @@ class ArticleController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'brand' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
-            'quantity' => 'required|string|max:255',
-            'type_id' => 'required|exists:types,id',
-            'price' => 'required|numeric|min:0',
-            'user_id' => 'required|exists:users,id',
-            'color_id' => 'required|exists:colors,id',
-        ]);
+        try {
+            $articleData = $request->validate([
+                'brand' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
+                'quantity' => 'required|string|max:255',
+                'type_id' => 'required|exists:types,id',
+                'price' => 'required|numeric|min:0',
+                'user_id' => 'required|exists:users,id',
+                'color_id' => 'required|exists:colors,id',
+                'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
 
-        $article = $this->articleService->createArticle($validated);
+            $images = $request->hasFile('images') ? $request->file('images') : [];
 
-        return response()->json($article, Response::HTTP_CREATED);
+            $article = $this->articleService->createOrUpdateArticle($articleData, $images);
+
+            return ResponseHelper::success('Article saved successfully', $article, Response::HTTP_CREATED);
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
     }
 
-    public function show(Article $article)
+    public function show($id)
     {
-        return response()->json($article);
+        try {
+            $article = Article::find($id);
+
+            if (!$article) {
+                return ResponseHelper::error('Article not found', Response::HTTP_NOT_FOUND);
+            }
+
+            return ResponseHelper::success('Get article', $this->articleService->getArticleById($article));
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
+
 
     public function edit(Article $article)
     {
         //
     }
 
-    public function update(Request $request, Article $article)
+    public function update(Request $request)
     {
-        $validated = $request->validate([
-            'brand' => 'sometimes|required|string|max:255',
-            'name' => 'sometimes|required|string|max:255',
-            'quantity' => 'sometimes|required|string|max:255',
-            'type_id' => 'sometimes|required|exists:types,id',
-            'price' => 'sometimes|required|numeric|min:0',
-            'user_id' => 'sometimes|required|exists:users,id',
-            'color_id' => 'sometimes|required|exists:colors,id',
-        ]);
+        try {
+            $articleData = $request->validate([
+                'brand' => 'required|string|max:255',
+                'name' => 'required|string|max:255',
+                'quantity' => 'required|string|max:255',
+                'type_id' => 'required|exists:types,id',
+                'price' => 'required|numeric|min:0',
+                'color_id' => 'required|exists:colors,id',
+                'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            ]);
 
-        $article->update($validated);
+            $images = $request->hasFile('images') ? $request->file('images') : [];
 
-        return response()->json($article);
+            $article = $this->articleService->createOrUpdateArticle($articleData, $images);
+
+            return ResponseHelper::success('Article updated successfully', $article, Response::HTTP_CREATED);
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    public function destroy(Article $article)
+    public function destroy($id)
     {
-        $article->delete();
+        try {
+            if (!$id) {
+                return ResponseHelper::error('Wrong parameter', Response::HTTP_BAD_REQUEST);
+            }
 
-        return response()->json(['message' => 'Article deleted successfully'], Response::HTTP_NO_CONTENT);
+            $deleted = $this->articleService->deleteArticle($id);
+            if ($deleted) {
+                return ResponseHelper::success('Article deleted successfully');
+            } else {
+                return ResponseHelper::error('Article not found', Response::HTTP_NOT_FOUND);
+            }
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getTopArticles() {
+        $articles = $this->articleService->getTopArticles();
+
+        return ResponseHelper::success('Get top articles', $articles);
     }
 }

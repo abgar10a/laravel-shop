@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserTypes;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -10,8 +11,8 @@ class AuthController extends Controller
 {
     private $authService;
 
-    public function __construct(AuthService $authService) {
-        $this->authService = $authService;
+    public function __construct() {
+        $this->authService = app(AuthService::class);
     }
 
     // User Login & Get Token
@@ -34,7 +35,7 @@ class AuthController extends Controller
             $userData = $request->validate([
                 'name' => ['required', 'min:3', 'max:10'],
                 'email' => ['required', 'email', Rule::unique('users', 'email')],
-                'user_type' => ['required', Rule::in(['I', 'B'])],
+                'user_type' => ['required', Rule::in(UserTypes::cases())],
                 'address' => ['required', 'string', 'max:255'],
                 'city' => ['required', 'string', 'max:100'],
                 'postal_code' => ['required', 'string', 'max:20'],

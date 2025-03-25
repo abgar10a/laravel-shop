@@ -68,7 +68,7 @@ class AuthService
     public function respondWithToken($token)
     {
         return [
-            'access_token' => $token,
+            'access_token' => $token, //TODO camelcase
             'token_type' => 'bearer',
             'expires_in' => Auth::factory()->getTTL() * 60
         ];

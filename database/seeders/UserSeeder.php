@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserTypes;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use Faker\Factory as Faker;
@@ -20,7 +21,7 @@ class UserSeeder extends Seeder
             User::create([
                 'name' => $name,
                 'email' => $faker->unique()->safeEmail,
-                'user_type' => $faker->randomElement(['I', 'B']),
+                'user_type' => $faker->randomElement(UserTypes::cases()),
                 'address' => $faker->address,
                 'city' => $faker->city,
                 'postal_code' => $faker->postcode,
