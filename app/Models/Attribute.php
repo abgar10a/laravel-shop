@@ -9,4 +9,9 @@ class Attribute extends Model
 {
     /** @use HasFactory<\Database\Factories\AttributeFactory> */
     use HasFactory;
+
+    protected $fillable = [
+        'identifier',
+        'title'
+    ];
 }

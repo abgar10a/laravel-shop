@@ -10,6 +10,19 @@ use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
+/**
+ * @OA\Info(
+ *     title="Order API",
+ *     version="1.0.0",
+ *     description="API for managing orders",
+ *     @OA\Contact(email="your-email@example.com")
+ * )
+ *
+ * @OA\Server(
+ *     url=L5_SWAGGER_CONST_HOST,
+ *     description="API Server"
+ * )
+ */
 class OrderController extends Controller
 {
     protected $orderService;
@@ -33,18 +46,10 @@ class OrderController extends Controller
                 return ResponseHelper::error('No orders found for user', Response::HTTP_NOT_FOUND);
             }
 
-            return ResponseHelper::success('Orders retrieved successfully', $orders);
+            return ResponseHelper::successData('Orders retrieved successfully', $orders);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -68,7 +73,7 @@ class OrderController extends Controller
 
             $this->emailService->sendEmail(auth()->user(), 'Order status update', $emailData, 'order_status');
 
-            return ResponseHelper::success('Order created successfully', $order, Response::HTTP_CREATED);
+            return ResponseHelper::successData('Order created successfully', $order, Response::HTTP_CREATED);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -79,15 +84,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        return ResponseHelper::success('Order retrieved successfully', $order);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Order $order)
-    {
-        //
+        return ResponseHelper::successData('Order retrieved successfully', $order);
     }
 
     /**
@@ -106,7 +103,7 @@ class OrderController extends Controller
             'status' => OrderStatus::CANCELED
         ]);
 
-        return ResponseHelper::success('Order updated successfully', $id);
+        return ResponseHelper::successData('Order updated successfully', $id);
     }
 
     /**
@@ -125,7 +122,7 @@ class OrderController extends Controller
 
             $order->delete();
 
-            return ResponseHelper::success('Order deleted successfully');
+            return ResponseHelper::successData('Order deleted successfully');
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Middleware\CheckUserRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,7 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            Route::prefix('auth')->group(base_path('routes/auth.php'));
+            Route::prefix('api/auth')->group(base_path('routes/auth.php'));
         }
     )
     ->withMiddleware(function (Middleware $middleware) {

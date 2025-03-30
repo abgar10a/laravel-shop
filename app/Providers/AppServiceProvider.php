@@ -7,6 +7,7 @@ use App\Services\AuthService;
 use App\Services\EmailService;
 use App\Services\OrderService;
 use App\Services\ReviewService;
+use App\Services\UploadService;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -30,6 +31,12 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->singleton(EmailService::class, function ($app) {
             return new EmailService();
+        });
+        $this->app->singleton(ArticleService::class, function ($app) {
+            return new ArticleService();
+        });
+        $this->app->singleton(UploadService::class, function ($app) {
+            return new UploadService();
         });
     }
 

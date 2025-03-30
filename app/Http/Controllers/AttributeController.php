@@ -2,66 +2,92 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Attribute;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreAttributeRequest;
-use App\Http\Requests\UpdateAttributeRequest;
+use App\Helpers\ResponseHelper;
+use App\Services\AttributeService;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class AttributeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    private $attributeService;
+
+    public function __construct()
     {
-        //
+        $this->attributeService = app(AttributeService::class);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function index($type)
     {
-        //
+        try {
+            if ($type) {
+                $attrData = $this->attributeService->getAttributesByType($type);
+                if (isset($attrData['error'])) {
+                    return ResponseHelper::error($attrData['error'], Response::HTTP_NOT_FOUND);
+                } else {
+                    return ResponseHelper::successData($attrData['message'], $attrData);
+                }
+            } else {
+                return ResponseHelper::error('Wrong type');
+            }
+        } catch (\Throwable $th) {
+            return ResponseHelper::error('Invalid data', Response::HTTP_BAD_REQUEST);
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreAttributeRequest $request)
+    public function store(Request $request)
     {
-        //
+        try {
+            $attrData = $request->validate([
+                'identifier' => 'required|max:30',
+                'title' => 'required|max:30',
+                'type' => 'required'
+            ]);
+
+            $attrResponse = $this->attributeService->createAttribute($attrData);
+
+            if (isset($attrResponse['error'])) {
+                return ResponseHelper::error($attrResponse['error'], Response::HTTP_NOT_FOUND);
+            } else {
+                return ResponseHelper::successData($attrResponse['message'], $attrResponse);
+            }
+        } catch (\Throwable $th) {
+            return ResponseHelper::error('Invalid data', Response::HTTP_BAD_REQUEST);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Attribute $attribute)
+    public function update(Request $request, $id)
     {
-        //
+        try {
+            $attrData = $request->validate([
+                'identifier' => 'nullable|string|max:30',
+                'title' => 'nullable|max:30',
+            ]);
+
+            $attrData['id'] = $id;
+
+            $attrResponse = $this->attributeService->updateAttribute($attrData);
+
+            if (isset($attrResponse['error'])) {
+                return ResponseHelper::error($attrResponse['error'], Response::HTTP_NOT_FOUND);
+            } else {
+                return ResponseHelper::successData($attrResponse['message'], $attrResponse);
+            }
+        } catch (\Throwable $th) {
+            return ResponseHelper::error('Invalid input', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Attribute $attribute)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAttributeRequest $request, Attribute $attribute)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Attribute $attribute)
-    {
-        //
+        try {
+            $attrResponse = $this->attributeService->deleteAttribute($id);
+            if (isset($attrResponse['error'])) {
+                return ResponseHelper::error($attrResponse['error'], Response::HTTP_NOT_FOUND);
+            } else {
+                return ResponseHelper::successData($attrResponse['message']);
+            }
+        } catch (\Throwable $th) {
+            return ResponseHelper::error('Something went wrong', Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

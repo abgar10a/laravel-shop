@@ -2,66 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Upload;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreUploadRequest;
-use App\Http\Requests\UpdateUploadRequest;
+use App\Helpers\ResponseHelper;
+use App\Services\UploadService;
 
 class UploadController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
+
+    private $uploadService;
+
+    public function __construct() {
+        $this->uploadService = app(UploadService::class);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show($uploadId)
     {
-        //
-    }
+        try {
+            $fileData = $this->uploadService->getFile($uploadId);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreUploadRequest $request)
-    {
-        //
-    }
+            if (isset($fileData['error'])) {
+                return ResponseHelper::error($fileData['error']);
+            }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Upload $upload)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Upload $upload)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateUploadRequest $request, Upload $upload)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Upload $upload)
-    {
-        //
+            return ResponseHelper::successData($fileData['message'], $fileData);
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage());
+        }
     }
 }

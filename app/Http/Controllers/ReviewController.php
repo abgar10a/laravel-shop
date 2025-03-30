@@ -31,7 +31,7 @@ class ReviewController extends Controller
                 return ResponseHelper::error('No reviews found for this article', Response::HTTP_NOT_FOUND);
             }
 
-            return ResponseHelper::success('Reviews retrieved successfully', $reviews);
+            return ResponseHelper::successData('Reviews retrieved successfully', $reviews);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -59,7 +59,7 @@ class ReviewController extends Controller
         try {
             $review = $this->reviewService->createReview($reviewData);
 
-            return ResponseHelper::success('Review created successfully', $review, Response::HTTP_CREATED);
+            return ResponseHelper::successData('Review created successfully', $review, Response::HTTP_CREATED);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -87,7 +87,7 @@ class ReviewController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'rating' => 'required|numeric|between:0,5',
+            'rating' => 'nullable|numeric|between:0,5',
             'comment' => 'nullable|string|max:255',
         ]);
 
@@ -108,7 +108,7 @@ class ReviewController extends Controller
                 'comment' => $request->comment,
             ]);
 
-            return ResponseHelper::success('Review updated successfully', $review);
+            return ResponseHelper::successData('Review updated successfully', $review);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -132,7 +132,7 @@ class ReviewController extends Controller
 
             $review->delete();
 
-            return ResponseHelper::success('Review deleted successfully');
+            return ResponseHelper::successData('Review deleted successfully');
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

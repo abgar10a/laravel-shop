@@ -2,8 +2,11 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\ResponseHelper;
 use Closure;
 use Illuminate\Support\Facades\Auth;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class Authenticate
 {
@@ -21,6 +24,6 @@ class Authenticate
             return $next($request);
         }
 
-        return response()->json(['message' => 'Unauthorized'], 401);
+        return ResponseHelper::error('Unauthorized.', 401);
     }
 }
