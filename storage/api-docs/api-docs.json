@@ -1,10 +1,14 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Order API",
-        "description": "API for managing orders",
+        "title": "PhpShop",
+        "description": "API documentation for your Laravel project",
         "contact": {
-            "email": "your-email@example.com"
+            "email": "ab.xach@gmail.com"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
         },
         "version": "1.0.0"
     },
@@ -325,18 +329,18 @@
                 ]
             }
         },
-        "/articles/{articleid}": {
+        "/articles/{articleId}": {
             "get": {
                 "tags": [
                     "Article"
                 ],
                 "summary": "Get article",
                 "description": "Get article",
-                "operationId": "838fe85f48acac62905dac4cfdb238d6",
+                "operationId": "235567fca892c5b290b0503a3062ea5b",
                 "parameters": [
                     {
                         "name": "articleId",
-                        "in": "query",
+                        "in": "path",
                         "description": "Article id",
                         "required": false,
                         "schema": {
@@ -520,11 +524,11 @@
                 ],
                 "summary": "Update article",
                 "description": "Update article",
-                "operationId": "88dfb25672c651301ec7f6e4133e4273",
+                "operationId": "dc948f02170c6f69b2f1fdda6e299f2e",
                 "parameters": [
                     {
                         "name": "articleId",
-                        "in": "query",
+                        "in": "path",
                         "description": "Article id",
                         "required": false,
                         "schema": {
@@ -774,11 +778,11 @@
                 ],
                 "summary": "Delete article",
                 "description": "Delete article",
-                "operationId": "35245dd7b63ca79d8671acbc65bbc559",
+                "operationId": "d971b8b7cefd606f932ff0c1ac9aa229",
                 "parameters": [
                     {
                         "name": "articleId",
-                        "in": "query",
+                        "in": "path",
                         "description": "Article id",
                         "required": false,
                         "schema": {
@@ -1219,72 +1223,6 @@
                 ]
             }
         },
-        "/auth/refresh-token": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Refresh token",
-                "description": "Refresh expired token",
-                "operationId": "f63bd8623627d4788e5207877d1c582d",
-                "responses": {
-                    "200": {
-                        "description": "Successful refreshed token",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Token refreshed successfully"
-                                        },
-                                        "error": {
-                                            "type": "boolean",
-                                            "example": "false"
-                                        },
-                                        "data": {
-                                            "properties": {
-                                                "token": {
-                                                    "type": "string",
-                                                    "example": "ddqwdehwd87287f2dh82hqddd82"
-                                                }
-                                            },
-                                            "type": "object"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthorized."
-                                        },
-                                        "error": {
-                                            "type": "boolean",
-                                            "example": "true"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/auth/forgot-password": {
             "post": {
                 "tags": [
@@ -1549,9 +1487,783 @@
                 },
                 "security": []
             }
+        },
+        "/orders": {
+            "get": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Get orders",
+                "description": "Get orders for user",
+                "operationId": "325fd3d55bbe9bb39645269928fa4983",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "The page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 6
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Orders for page",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Orders for page 1"
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "page": {
+                                                    "type": "integer",
+                                                    "example": "1"
+                                                },
+                                                "orders": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": "111"
+                                                            },
+                                                            "brand": {
+                                                                "type": "string",
+                                                                "example": "Brand"
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "Model"
+                                                            },
+                                                            "status": {
+                                                                "type": "string",
+                                                                "example": "delivering"
+                                                            },
+                                                            "order_date": {
+                                                                "type": "string",
+                                                                "example": "2025-03-30 03:18:10"
+                                                            },
+                                                            "delivery_date": {
+                                                                "type": "string",
+                                                                "example": "null"
+                                                            },
+                                                            "price": {
+                                                                "type": "number",
+                                                                "format": "double",
+                                                                "example": "33.33"
+                                                            },
+                                                            "order_quantity": {
+                                                                "type": "integer",
+                                                                "example": "4"
+                                                            },
+                                                            "image": {
+                                                                "type": "string",
+                                                                "example": "path/to/image"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Post order",
+                "description": "Post order",
+                "operationId": "445bab4f7dc9ea6fcd54f286c0209478",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "article_id",
+                                    "order_quantity"
+                                ],
+                                "properties": {
+                                    "article_id": {
+                                        "type": "integer",
+                                        "example": "63"
+                                    },
+                                    "order_quantity": {
+                                        "type": "integer",
+                                        "example": "3"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Order created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Order created successfully."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "order": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": "111"
+                                                        },
+                                                        "brand": {
+                                                            "type": "string",
+                                                            "example": "Brand"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Model"
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "delivering"
+                                                        },
+                                                        "order_date": {
+                                                            "type": "string",
+                                                            "example": "2025-03-30 03:18:10"
+                                                        },
+                                                        "delivery_date": {
+                                                            "type": "string",
+                                                            "example": "null"
+                                                        },
+                                                        "price": {
+                                                            "type": "number",
+                                                            "format": "double",
+                                                            "example": "33.33"
+                                                        },
+                                                        "order_quantity": {
+                                                            "type": "integer",
+                                                            "example": "4"
+                                                        },
+                                                        "image": {
+                                                            "type": "string",
+                                                            "example": "path/to/image"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/orders/{orderId}": {
+            "put": {
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Update order",
+                "description": "Update order",
+                "operationId": "6d462573901bba9d69113a61ca696549",
+                "parameters": [
+                    {
+                        "name": "orderId",
+                        "in": "path",
+                        "description": "Order id",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 6
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "status"
+                                ],
+                                "properties": {
+                                    "status": {
+                                        "type": "string",
+                                        "example": "delivering"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Order updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Order updated successfully."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "order": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": "111"
+                                                        },
+                                                        "brand": {
+                                                            "type": "string",
+                                                            "example": "Brand"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Model"
+                                                        },
+                                                        "status": {
+                                                            "type": "string",
+                                                            "example": "delivering"
+                                                        },
+                                                        "order_date": {
+                                                            "type": "string",
+                                                            "example": "2025-03-30 03:18:10"
+                                                        },
+                                                        "delivery_date": {
+                                                            "type": "string",
+                                                            "example": "null"
+                                                        },
+                                                        "price": {
+                                                            "type": "number",
+                                                            "format": "double",
+                                                            "example": "33.33"
+                                                        },
+                                                        "order_quantity": {
+                                                            "type": "integer",
+                                                            "example": "4"
+                                                        },
+                                                        "image": {
+                                                            "type": "string",
+                                                            "example": "path/to/image"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reviews/{articleId}": {
+            "get": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Get reviews",
+                "description": "Get reviews for article",
+                "operationId": "62b508d104951bc234f593b69c4bae71",
+                "parameters": [
+                    {
+                        "name": "articleId",
+                        "in": "path",
+                        "description": "Article id",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 6
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Reviews for article",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Reviews retrieved successfully"
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "reviews": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string",
+                                                                "example": "111"
+                                                            },
+                                                            "rating": {
+                                                                "type": "integer",
+                                                                "example": "4"
+                                                            },
+                                                            "comment": {
+                                                                "type": "string",
+                                                                "example": "nice article"
+                                                            },
+                                                            "user": {
+                                                                "properties": {
+                                                                    "id": {
+                                                                        "type": "string",
+                                                                        "example": "111"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "example": "Marcus"
+                                                                    }
+                                                                },
+                                                                "type": "object"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Article not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Article not found."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Something went wrong",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Something went wrong."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reviews": {
+            "post": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Post review",
+                "description": "Post review",
+                "operationId": "9fe745d363761b681b0e4f1d129e2456",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "article_id",
+                                    "rating",
+                                    "comment"
+                                ],
+                                "properties": {
+                                    "article_id": {
+                                        "type": "integer",
+                                        "example": "63"
+                                    },
+                                    "rating": {
+                                        "type": "integer",
+                                        "example": "3"
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "nice"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Order created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Order created successfully."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "order": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "111"
+                                                        },
+                                                        "rating": {
+                                                            "type": "integer",
+                                                            "example": "3"
+                                                        },
+                                                        "comment": {
+                                                            "type": "string",
+                                                            "example": "nice"
+                                                        },
+                                                        "user_id": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "article_id": {
+                                                            "type": "number",
+                                                            "format": "double",
+                                                            "example": "33.33"
+                                                        },
+                                                        "order_date": {
+                                                            "type": "string",
+                                                            "example": "2025-03-30 03:18:10"
+                                                        },
+                                                        "delivery_date": {
+                                                            "type": "string",
+                                                            "example": "null"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/reviews/{reviewId}": {
+            "put": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Update review",
+                "description": "Update review",
+                "operationId": "6e69f8b89f818600d713ddcb5d65997f",
+                "parameters": [
+                    {
+                        "name": "reviewId",
+                        "in": "path",
+                        "description": "Review id",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 6
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "rating",
+                                    "comment"
+                                ],
+                                "properties": {
+                                    "rating": {
+                                        "type": "integer",
+                                        "example": "3"
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "nice"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Order updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Order updated successfully."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "order": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "111"
+                                                        },
+                                                        "rating": {
+                                                            "type": "integer",
+                                                            "example": "3"
+                                                        },
+                                                        "comment": {
+                                                            "type": "string",
+                                                            "example": "nice"
+                                                        },
+                                                        "user_id": {
+                                                            "type": "string",
+                                                            "example": "1"
+                                                        },
+                                                        "article_id": {
+                                                            "type": "number",
+                                                            "format": "double",
+                                                            "example": "33.33"
+                                                        },
+                                                        "order_date": {
+                                                            "type": "string",
+                                                            "example": "2025-03-30 03:18:10"
+                                                        },
+                                                        "delivery_date": {
+                                                            "type": "string",
+                                                            "example": "null"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
+        "responses": {
+            "401": {
+                "description": "Unauthorized",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "Unauthorized."
+                                },
+                                "error": {
+                                    "type": "boolean",
+                                    "example": "true"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "404": {
+                "description": "Article not found",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "Article not found."
+                                },
+                                "error": {
+                                    "type": "boolean",
+                                    "example": "true"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            },
+            "500": {
+                "description": "The selected type id is invalid.",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "properties": {
+                                "message": {
+                                    "type": "string",
+                                    "example": "The selected type id is invalid.."
+                                },
+                                "error": {
+                                    "type": "boolean",
+                                    "example": "true"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    }
+                }
+            }
+        },
         "securitySchemes": {
             "bearerAuth": {
                 "type": "http",
@@ -1574,6 +2286,14 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Orders",
+            "description": "Orders"
+        },
+        {
+            "name": "Reviews",
+            "description": "Reviews"
         }
     ]
 }

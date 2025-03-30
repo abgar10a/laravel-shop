@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Relations\ArticleImageRel;
+use App\Models\Relations\AttributeArticleRel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,18 @@ class Article extends Model
     public function reviews()
     {
         return $this->hasMany(Review::class, 'article_id', 'id');
+    }
+
+    public function attributes()
+    {
+        return $this->hasManyThrough(
+            Attribute::class,
+            AttributeArticleRel::class,
+            'article_id',
+            'id',
+            'id',
+            'attribute_id'
+        )->select(['attributes.id', 'attributes.identifier',  'attributes.title', 'attributes_article_rel.value']);
     }
 
     public function reviewsWithUser(){

@@ -20,33 +20,144 @@ class ReviewController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/reviews/{articleId}",
+     *     tags={"Reviews"},
+     *     summary="Get reviews",
+     *     description="Get reviews for article",
+     *     security={{"bearerAuth":{}}},
+     *
+     *         @OA\Parameter(
+     *             name="articleId",
+     *             in="path",
+     *             description="Article id",
+     *             required=false,
+     *             @OA\Schema(
+     *                 type="integer",
+     *                 default=1,
+     *                 example=6
+     *             )
+     *         ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Reviews for article",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Reviews retrieved successfully"),
+     *             @OA\Property(property="error", type="boolean", example="false"),
+     *             @OA\Property(property="data",
+     *                          type="object",
+     *                          @OA\Property(property="reviews", type="array",
+     *                          @OA\Items(type="object",
+     *                                    @OA\Property(property="id", type="string", example="111"),
+     *                                    @OA\Property(property="rating", type="integer", example="4"),
+     *                                    @OA\Property(property="comment", type="string", example="nice article"),
+     *                                   @OA\Property(property="user",
+     *                                                  type="object",
+     *                                                @OA\Property(property="id", type="string", example="111"),
+     *                                                @OA\Property(property="name", type="string", example="Marcus"),
+     *                                                  ),
+     *                                   )
+     *                          ),
+     *              )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Unauthorized."),
+     *             @OA\Property(property="error", type="boolean", example="true")
+     *         )
+     *     ),
+     *
+     *      @OA\Response(
+     *           response=404,
+     *           description="Article not found",
+     *
+     *           @OA\JsonContent(
+     *
+     *               @OA\Property(property="message", type="string", example="Article not found."),
+     *               @OA\Property(property="error", type="boolean", example="true")
+     *           )
+     *      ),
+     *
+     *      @OA\Response(
+     *           response=500,
+     *           description="Something went wrong",
+     *
+     *           @OA\JsonContent(
+     *
+     *                @OA\Property(property="message", type="string", example="Something went wrong."),
+     *                @OA\Property(property="error", type="boolean", example="true")
+     *            )
+     *       ),
+     * )
      */
     public function index($articleId)
     {
         try {
-            $reviews = $this->reviewService->getReviewsByArticleId($articleId);
+            $reviewResponse = $this->reviewService->getReviewsByArticleId($articleId);
 
-            if ($reviews->isEmpty()) {
-                return ResponseHelper::error('No reviews found for this article', Response::HTTP_NOT_FOUND);
+            if (isset($reviewResponse['error'])) {
+                return ResponseHelper::error($reviewResponse['error'], Response::HTTP_NOT_FOUND);
             }
 
-            return ResponseHelper::successData('Reviews retrieved successfully', $reviews);
+            return ResponseHelper::successData($reviewResponse['message'], $reviewResponse);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/reviews",
+     *     tags={"Reviews"},
+     *     summary="Post review",
+     *     description="Post review",
+     *     security={{"bearerAuth":{}}},
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *
+     *          @OA\JsonContent(
+     *              required={"article_id", "rating", "comment"},
+     *
+     *              @OA\Property(property="article_id", type="integer", example="63"),
+     *              @OA\Property(property="rating", type="integer", example="3"),
+     *              @OA\Property(property="comment", type="string", example="nice"),
+     *          )
+     *      ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Order created successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Order created successfully."),
+     *             @OA\Property(property="error", type="boolean", example="false"),
+     *             @OA\Property(property="data",
+     *                          type="object",
+     *                          @OA\Property(property="order", type="object",
+     *                                       @OA\Property(property="id", type="string", example="111"),
+     *                                       @OA\Property(property="rating", type="integer", example="3"),
+     *                                       @OA\Property(property="comment", type="string", example="nice"),
+     *                                       @OA\Property(property="user_id", type="string", example="1"),
+     *                                       @OA\Property(property="article_id", type="double", example="33.33"),
+     *                                       @OA\Property(property="order_date", type="string", example="2025-03-30 03:18:10"),
+     *                                       @OA\Property(property="delivery_date", type="string", example="null"),
+     *                                       )
+     *                          ),
+     *              )
+     *         )
+     *     ),
+     *
+     * )
      */
     public function store(Request $request)
     {
@@ -57,80 +168,107 @@ class ReviewController extends Controller
         ]);
 
         try {
-            $review = $this->reviewService->createReview($reviewData);
+            $reviewResponse = $this->reviewService->createReview($reviewData, $request->user());
 
-            return ResponseHelper::successData('Review created successfully', $review, Response::HTTP_CREATED);
+            if (isset($reviewResponse['error'])) {
+                return ResponseHelper::error($reviewResponse['error'], Response::HTTP_NOT_FOUND);
+            }
+
+            return ResponseHelper::successData($reviewResponse['message'], $reviewResponse, Response::HTTP_CREATED);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(Review $review)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Review $review)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
+     * @OA\Put(
+     *     path="/reviews/{reviewId}",
+     *     tags={"Reviews"},
+     *     summary="Update review",
+     *     description="Update review",
+     *     security={{"bearerAuth":{}}},
+     *
+     *       @OA\Parameter(
+     *           name="reviewId",
+     *           in="path",
+     *           description="Review id",
+     *           required=false,
+     *           @OA\Schema(
+     *               type="integer",
+     *               default=1,
+     *               example=6
+     *           )
+     *       ),
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *
+     *          @OA\JsonContent(
+     *              required={"rating", "comment"},
+     *
+     *              @OA\Property(property="rating", type="integer", example="3"),
+     *              @OA\Property(property="comment", type="string", example="nice"),
+     *          )
+     *      ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Order updated successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Order updated successfully."),
+     *             @OA\Property(property="error", type="boolean", example="false"),
+     *             @OA\Property(property="data",
+     *                          type="object",
+     *                          @OA\Property(property="order", type="object",
+     *                                       @OA\Property(property="id", type="string", example="111"),
+     *                                       @OA\Property(property="rating", type="integer", example="3"),
+     *                                       @OA\Property(property="comment", type="string", example="nice"),
+     *                                       @OA\Property(property="user_id", type="string", example="1"),
+     *                                       @OA\Property(property="article_id", type="double", example="33.33"),
+     *                                       @OA\Property(property="order_date", type="string", example="2025-03-30 03:18:10"),
+     *                                       @OA\Property(property="delivery_date", type="string", example="null"),
+     *                                       )
+     *                          ),
+     *              )
+     *         )
+     *     ),
+     *
+     * )
      */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'rating' => 'nullable|numeric|between:0,5',
-            'comment' => 'nullable|string|max:255',
-        ]);
-
         try {
-            $review = Review::find($id);
-            $isUserLoggedIn = $review->user_id === auth()->id();
-
-            if (!$isUserLoggedIn) {
-                return ResponseHelper::error('Unauthorized', Response::HTTP_FORBIDDEN);
-            }
-
-            if (!$review) {
-                return ResponseHelper::error('Review not found', Response::HTTP_NOT_FOUND);
-            }
-
-            $review->update([
-                'rating' => $request->rating,
-                'comment' => $request->comment,
+            $reviewData = $request->validate([
+                'rating' => 'required|numeric|between:0,5',
+                'comment' => 'required|string|max:255',
             ]);
 
-            return ResponseHelper::successData('Review updated successfully', $review);
+            $reviewResponse = $this->reviewService->updateReview($id, $reviewData, $request->user());
+
+            if (isset($reviewResponse['error'])) {
+                return ResponseHelper::error($reviewResponse['error'], Response::HTTP_NOT_FOUND);
+            }
+
+            return ResponseHelper::successData('Review updated successfully', $reviewResponse, Response::HTTP_OK);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
-            $review = Review::find($id);
-            $isUserLoggedIn = $review->user_id === auth()->id();
-
-            if (!$review) {
-                return ResponseHelper::error('Review not found', Response::HTTP_NOT_FOUND);
-            } else if (!$isUserLoggedIn) {
-                return ResponseHelper::error('Unauthorized', Response::HTTP_FORBIDDEN);
+            if (!$id) {
+                return ResponseHelper::error('Review id is required', Response::HTTP_BAD_REQUEST);
             }
 
-            $review->delete();
+            $reviewResponse = $this->reviewService->deleteReview($id, $request->user());
+
+            if ($reviewResponse['error']) {
+                return ResponseHelper::error($reviewResponse['error'], Response::HTTP_NOT_FOUND);
+            }
 
             return ResponseHelper::successData('Review deleted successfully');
         } catch (\Throwable $th) {

@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserTypes;
 use Illuminate\Auth\Access\Response;
 use App\Models\Article;
 use App\Models\User;
@@ -29,7 +30,7 @@ class ArticlePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->user_type === UserTypes::BUSINESS->value;
     }
 
     /**
@@ -37,7 +38,7 @@ class ArticlePolicy
      */
     public function update(User $user, Article $article): bool
     {
-        return false;
+        return $article->user_id === $user->id;
     }
 
     /**
@@ -45,7 +46,7 @@ class ArticlePolicy
      */
     public function delete(User $user, Article $article): bool
     {
-        return false;
+        return $user->can('update', $article);
     }
 
     /**

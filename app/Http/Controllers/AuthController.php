@@ -3,25 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserTypes;
+use App\Helpers\EmailHelper;
 use App\Helpers\ResponseHelper;
 use App\Services\AuthService;
-use App\Services\EmailService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use Tymon\JWTAuth\Exceptions\TokenInvalidException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
     private $authService;
-    private $emailService;
 
     public function __construct()
     {
         $this->authService = app(AuthService::class);
-        $this->emailService = app(EmailService::class);
     }
 
     /**
@@ -172,7 +167,7 @@ class AuthController extends Controller
         return response()->json($this->authService->getAuthenticatedUser());
     }
 
-     /**
+    /**
      * @OA\Post(
      *     path="/auth/logout",
      *     tags={"Auth"},
@@ -265,7 +260,7 @@ class AuthController extends Controller
             if (isset($reset['error'])) {
                 return ResponseHelper::error($reset['error'], Response::HTTP_NOT_FOUND);
             } else {
-                $this->emailService->sendEmail($reset['user'], 'Email confirmation', ['code' => $reset['code']], 'email_confirmation');
+                EmailHelper::sendEmail($reset['user'], 'Email confirmation', ['code' => $reset['code']], 'email_confirmation');
 
                 return ResponseHelper::success('Email confirmation sent', Response::HTTP_OK);
             }
@@ -413,7 +408,7 @@ class AuthController extends Controller
             if (isset($reset['error'])) {
                 return ResponseHelper::error($reset['error'], Response::HTTP_NOT_FOUND);
             } else {
-                $this->emailService->sendEmail($reset['user'], 'Email confirmation', [], 'password_reset');
+                EmailHelper::sendEmail($reset['user'], 'Email confirmation', [], 'password_reset');
 
                 return ResponseHelper::success($reset['message'], Response::HTTP_OK);
             }

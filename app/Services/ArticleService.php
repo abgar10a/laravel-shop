@@ -7,6 +7,7 @@ use App\Models\Article;
 use App\Models\Order;
 use App\Models\Relations\ArticleImageRel;
 use App\Models\Upload;
+use Illuminate\Support\Facades\Storage;
 
 class ArticleService
 {
@@ -43,10 +44,14 @@ class ArticleService
         }
     }
 
-    public function updateArticle($id, array $articleData, array $images = [])
+    public function updateArticle($id, array $articleData, array $images = [], $user = null)
     {
         try {
             $article = Article::find($id);
+
+            if ($user->cannot('update', $article)) {
+                return ResponseHelper::build(error: "You don't have permission to update article");
+            }
 
             if (!empty($images)) {
                 $sequence = 1;
@@ -95,21 +100,28 @@ class ArticleService
                     ->with(['images' => function ($query) {
                         $query->where('article_image_rel.sequence', 1);
                     }])
-                    ->paginate(10)
-                    ->through(function ($article) {
-                        $image = $article->images->first();
+                    ->paginate(10);
 
-                        return [
-                            'id' => $article->id,
-                            'brand' => $article->brand,
-                            'name' => $article->name,
-                            'price' => $article->price,
-                            'rating' => $article->rating,
-                            'image' => $image ? asset('storage/' . $image->path) : null,
-                        ];
-                    })
-                    ->toArray();
-                return ResponseHelper::build('Articles for page ' . $articles['current_page'], ['page' => $articles['current_page'], 'articles' => $articles['data']]);
+                $totalCount = $articles->total();
+
+                $transformedArticles = $articles->through(function ($article) {
+                    $image = $article->images->first();
+
+                    return [
+                        'id' => $article->id,
+                        'brand' => $article->brand,
+                        'name' => $article->name,
+                        'price' => $article->price,
+                        'rating' => $article->rating,
+                        'image' => $image ? asset(Storage::url($image->path)) : null,
+                    ];
+                })->toArray();
+
+                return ResponseHelper::build('Articles for page ' . $articles['current_page'],
+                    [
+                        'page' => $transformedArticles['current_page'],
+                        'total_items' => $totalCount,
+                        'articles' => $transformedArticles['data']]);
             }
         } catch (\Throwable $th) {
             return ResponseHelper::build(error: 'Failed to get articles list');
@@ -135,7 +147,7 @@ class ArticleService
                         'name' => $article->name,
                         'price' => $article->price,
                         'rating' => $article->rating,
-                        'image' => $image ? asset('storage/' . $image->path) : null,
+                        'image' => $image ? asset(Storage::url($image->path)) : null,
                     ];
                 });
 
@@ -169,27 +181,32 @@ class ArticleService
             'images' => $article->images->map(function ($image) {
                 return [
                     'id' => $image->id,
-                    'path' => $image->path,
+                    'path' => asset(Storage::url($image->path)),
                 ];
             }),
-            'reviews' => $article->reviewsWithUser()
+            'reviews' => $article->reviewsWithUser(),
+            'attributes' => $article->attributes
         ];
 
         return ResponseHelper::build('Article successfully retrieved', $articleResponse);
     }
 
-    public function deleteArticle($id)
+    public function deleteArticle($id, $user)
     {
         try {
             $article = Article::find($id);
             if ($article) {
+                if ($user->cannot('delete', $article)) {
+                    return ResponseHelper::build(error: "You don't have permission to remove article");
+                }
+
                 $article->delete();
-                return true;
+                return ResponseHelper::build('Article successfully deleted');
             } else {
-                return false;
+                return ResponseHelper::build(error: 'Article not found');
             }
         } catch (\Throwable $th) {
-            return false;
+            return ResponseHelper::build(error: 'Failed to delete article');
         }
     }
 }

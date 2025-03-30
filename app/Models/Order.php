@@ -27,27 +27,35 @@ class Order extends Model
 
     public static function getOrdersByUserId($userId)
     {
-        $orders = Order::select('id', 'article_id', 'status', 'price', 'order_quantity', 'order_date', 'delivery_date')
+        $ordersQuery = Order::select('id', 'article_id', 'status', 'price', 'order_quantity', 'order_date', 'delivery_date')
             ->where('user_id', $userId)
             ->orderBy('order_date', 'desc')
-            ->paginate(10)
-            ->through(function ($order) {
-                $article = Article::find($order->article_id);
-                $image = $article->images->first();
-                return [
-                    'id' => $order->id,
-                    'status' => $order->status,
-                    'price' => $order->price,
-                    'order_quantity' => $order->order_quantity,
-                    'order_date' => $order->order_date,
-                    'delivery_date' => $order->delivery_date,
-                    'brand' => $article->brand,
-                    'name' => $article->name,
-                    'image' => $image ? asset('storage/' . $image->path) : null,
-                ];
-            });
+            ->paginate(10);
 
-        return $orders;
+        $totalCount = $ordersQuery->total();
+
+        $orders = $ordersQuery->through(function ($order) {
+            $article = Article::find($order->article_id);
+            $image = $article->images->first();
+
+            return [
+                'id' => $order->id,
+                'status' => $order->status,
+                'price' => $order->price,
+                'order_quantity' => $order->order_quantity,
+                'order_date' => $order->order_date,
+                'delivery_date' => $order->delivery_date,
+                'brand' => $article->brand,
+                'name' => $article->name,
+                'image' => $image ? asset('storage/' . $image->path) : null,
+            ];
+        })->toArray();
+
+        return [
+            'current_page' => $ordersQuery->currentPage(),
+            'total_items' => $totalCount,
+            'orders' => $orders['data'],
+        ];
     }
 
     public static function getOrderedArticleQuantity($articleId) {

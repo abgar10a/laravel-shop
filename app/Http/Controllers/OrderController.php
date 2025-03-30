@@ -5,124 +5,267 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Helpers\ResponseHelper;
 use App\Models\Order;
-use App\Services\EmailService;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Validation\Rule;
 
-/**
- * @OA\Info(
- *     title="Order API",
- *     version="1.0.0",
- *     description="API for managing orders",
- *     @OA\Contact(email="your-email@example.com")
- * )
- *
- * @OA\Server(
- *     url=L5_SWAGGER_CONST_HOST,
- *     description="API Server"
- * )
- */
 class OrderController extends Controller
 {
     protected $orderService;
-    protected $emailService;
 
     public function __construct()
     {
         $this->orderService = app(OrderService::class);
-        $this->emailService = app(EmailService::class);
     }
 
     /**
-     * Display a listing of the resource.
+     * @OA\Get(
+     *     path="/orders",
+     *     tags={"Orders"},
+     *     summary="Get orders",
+     *     description="Get orders for user",
+     *     security={{"bearerAuth":{}}},
+     *
+     *     @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          description="The page number for pagination",
+     *          required=false,
+     *          @OA\Schema(
+     *              type="integer",
+     *              default=1,
+     *              example=6
+     *          )
+     *      ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Orders for page",
+     *
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Orders for page 1"),
+     *             @OA\Property(property="error", type="boolean", example="false"),
+     *             @OA\Property(property="data",
+     *                          type="object",
+     *                          @OA\Property(property="page", type="integer", example="1"),
+     *                          @OA\Property(property="orders", type="array",
+     *                          @OA\Items(type="object",
+     *                                    @OA\Property(property="id", type="integer", example="111"),
+     *                                    @OA\Property(property="brand", type="string", example="Brand"),
+     *                                    @OA\Property(property="name", type="string", example="Model"),
+     *                                    @OA\Property(property="status", type="string", example="delivering"),
+     *                                    @OA\Property(property="order_date", type="string", example="2025-03-30 03:18:10"),
+     *                                   @OA\Property(property="delivery_date", type="string", example="null"),
+     *                                   @OA\Property(property="price", type="double", example="33.33"),
+     *                                    @OA\Property(property="order_quantity", type="integer", example="4"),
+     *                                    @OA\Property(property="image", type="string", example="path/to/image"),
+     *                                   )
+     *                          ),
+     *              )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Unauthorized",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Unauthorized."),
+     *             @OA\Property(property="error", type="boolean", example="true")
+     *         )
+     *     ),
+     * )
      */
     public function index()
     {
         try {
-            $orders = $this->orderService->getOrdersForUser(auth()->id());
+            $ordersResponse = $this->orderService->getOrdersForUser(auth()->id());
 
-            if ($orders->isEmpty()) {
-                return ResponseHelper::error('No orders found for user', Response::HTTP_NOT_FOUND);
+            if (isset($ordersResponse['error'])) {
+                return ResponseHelper::error($ordersResponse['error'], Response::HTTP_BAD_REQUEST);
             }
 
-            return ResponseHelper::successData('Orders retrieved successfully', $orders);
+            return ResponseHelper::successData($ordersResponse['message'], $ordersResponse);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @OA\Post(
+     *     path="/orders",
+     *     tags={"Orders"},
+     *     summary="Post order",
+     *     description="Post order",
+     *     security={{"bearerAuth":{}}},
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *
+     *          @OA\JsonContent(
+     *              required={"article_id", "order_quantity"},
+     *
+     *              @OA\Property(property="article_id", type="integer", example="63"),
+     *              @OA\Property(property="order_quantity", type="integer", example="3"),
+     *          )
+     *      ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Order created successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Order created successfully."),
+     *             @OA\Property(property="error", type="boolean", example="false"),
+     *             @OA\Property(property="data",
+     *                          type="object",
+     *                          @OA\Property(property="order", type="object",
+     *                                       @OA\Property(property="id", type="integer", example="111"),
+     *                                       @OA\Property(property="brand", type="string", example="Brand"),
+     *                                       @OA\Property(property="name", type="string", example="Model"),
+     *                                       @OA\Property(property="status", type="string", example="delivering"),
+     *                                       @OA\Property(property="order_date", type="string", example="2025-03-30 03:18:10"),
+     *                                       @OA\Property(property="delivery_date", type="string", example="null"),
+     *                                       @OA\Property(property="price", type="double", example="33.33"),
+     *                                       @OA\Property(property="order_quantity", type="integer", example="4"),
+     *                                       @OA\Property(property="image", type="string", example="path/to/image"),
+     *                                       )
+     *                          ),
+     *              )
+     *         )
+     *     ),
+     *
+     *
+     * @OA\Response(
+     *          response=401,
+     *          description="Unauthorized",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Unauthorized."),
+     *              @OA\Property(property="error", type="boolean", example="true")
+     *          )
+     *      ),
+     *
+     * @OA\Response(
+     *            response=404,
+     *            description="Article not found",
+     *
+     *            @OA\JsonContent(
+     *
+     *                @OA\Property(property="message", type="string", example="Article not found."),
+     *                @OA\Property(property="error", type="boolean", example="true")
+     *            )
+     *        ),
+     *
+     * @OA\Response(
+     *          response=500,
+     *          description="The selected type id is invalid.",
+     *
+     *          @OA\JsonContent(
+     *
+     *              @OA\Property(property="message", type="string", example="The selected type id is invalid.."),
+     *              @OA\Property(property="error", type="boolean", example="true")
+     *          )
+     *      ),
+     * )
      */
     public function store(Request $request)
     {
         try {
+            if ($request->user()->cannot('create', Order::class)) {
+                return ResponseHelper::error("You don't have permission to create orders");
+            }
+
             $orderData = $request->validate([
                 'article_id' => 'required|exists:articles,id',
                 'order_quantity' => 'required|integer|min:1',
             ]);
 
-            $order = $this->orderService->createOrder($orderData);
+            $orderResponse = $this->orderService->createOrder($orderData);
 
-            $emailData = [
-                'order_status' => $order->status,
-                'article_id' => $order->article_id,
-                'url' => url('/'),
-            ];
+            if (isset($orderResponse['error'])) {
+                return ResponseHelper::error($orderResponse['error'], Response::HTTP_NOT_FOUND);
+            }
 
-            $this->emailService->sendEmail(auth()->user(), 'Order status update', $emailData, 'order_status');
-
-            return ResponseHelper::successData('Order created successfully', $order, Response::HTTP_CREATED);
+            return ResponseHelper::successData($orderResponse['message'], $orderResponse, Response::HTTP_CREATED);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
     /**
-     * Display the specified resource.
+     * @OA\Put(
+     *     path="/orders/{orderId}",
+     *     tags={"Orders"},
+     *     summary="Update order",
+     *     description="Update order",
+     *     security={{"bearerAuth":{}}},
+     *
+     *          @OA\Parameter(
+     *            name="orderId",
+     *            in="path",
+     *            description="Order id",
+     *            required=false,
+     *            @OA\Schema(
+     *                type="integer",
+     *                default=1,
+     *                example=6
+     *            )
+     *        ),
+     *
+     *      @OA\RequestBody(
+     *          required=true,
+     *
+     *          @OA\JsonContent(
+     *              required={"status"},
+     *
+     *              @OA\Property(property="status", type="string", example="delivering"),
+     *          )
+     *      ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Order updated successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Order updated successfully."),
+     *             @OA\Property(property="error", type="boolean", example="false"),
+     *             @OA\Property(property="data",
+     *                          type="object",
+     *                          @OA\Property(property="order", type="object",
+     *                                       @OA\Property(property="id", type="integer", example="111"),
+     *                                       @OA\Property(property="brand", type="string", example="Brand"),
+     *                                       @OA\Property(property="name", type="string", example="Model"),
+     *                                       @OA\Property(property="status", type="string", example="delivering"),
+     *                                       @OA\Property(property="order_date", type="string", example="2025-03-30 03:18:10"),
+     *                                       @OA\Property(property="delivery_date", type="string", example="null"),
+     *                                       @OA\Property(property="price", type="double", example="33.33"),
+     *                                       @OA\Property(property="order_quantity", type="integer", example="4"),
+     *                                       @OA\Property(property="image", type="string", example="path/to/image"),
+     *                                       )
+     *                          ),
+     *              )
+     *         )
+     *     ),
+     * )
      */
-    public function show(Order $order)
-    {
-        return ResponseHelper::successData('Order retrieved successfully', $order);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update($id)
-    {
-        $order = Order::find($id);
-        if (!$order) {
-            return ResponseHelper::error('Order not found', Response::HTTP_NOT_FOUND);
-        } else if ($order->user_id !== auth()->id()) {
-            return ResponseHelper::error('Unauthorized', Response::HTTP_FORBIDDEN);
-        }
-
-        $order->update([
-            'status' => OrderStatus::CANCELED
-        ]);
-
-        return ResponseHelper::successData('Order updated successfully', $id);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    public function update(Request $request, $id)
     {
         try {
-            $order = Order::find($id);
+            $orderData = $request->validate([
+                'status' => ['required', Rule::in(OrderStatus::cases())]
+            ]);
 
-            if (!$order) {
-                return ResponseHelper::error('Order not found', Response::HTTP_NOT_FOUND);
-            } else if ($order->user_id !== auth()->id()) {
-                return ResponseHelper::error('Unauthorized', Response::HTTP_FORBIDDEN);
+            $orderResponse = $this->orderService->updateOrder($request->user(), $id, $orderData['status']);
+
+            if (isset($orderResponse['error'])) {
+                return ResponseHelper::error($orderResponse['error']);
             }
 
-            $order->delete();
-
-            return ResponseHelper::successData('Order deleted successfully');
+            return ResponseHelper::successData($orderResponse['message'], $orderResponse);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

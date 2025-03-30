@@ -22,7 +22,9 @@ Route::middleware(Authenticate::class)->group(function () {
     ]);
 
     // orders
-    Route::apiResource('orders', OrderController::class);
+    Route::apiResource('orders', OrderController::class)->only([
+        'index', 'store', 'update'
+    ]);
 
     // attributes
     Route::get('attributes/{type}', [AttributeController::class, 'index']);
@@ -30,9 +32,8 @@ Route::middleware(Authenticate::class)->group(function () {
     Route::apiResource('attributes', AttributeController::class)->only([
         'store', 'update', 'destroy'
     ]);
+});
 
     // uploads
-});
     Route::get('uploads/{uploadId}', [UploadController::class, 'show']);
-
 

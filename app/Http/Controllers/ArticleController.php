@@ -201,7 +201,7 @@ class ArticleController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/articles/{articleid}",
+     *     path="/articles/{articleId}",
      *     tags={"Article"},
      *     summary="Get article",
      *     description="Get article",
@@ -209,7 +209,7 @@ class ArticleController extends Controller
      *
      *          @OA\Parameter(
      *           name="articleId",
-     *           in="query",
+     *           in="path",
      *           description="Article id",
      *           required=false,
      *           @OA\Schema(
@@ -302,7 +302,7 @@ class ArticleController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/articles/{articleid}",
+     *     path="/articles/{articleId}",
      *     tags={"Article"},
      *     summary="Update article",
      *     description="Update article",
@@ -310,7 +310,7 @@ class ArticleController extends Controller
      *
      *          @OA\Parameter(
      *           name="articleId",
-     *           in="query",
+     *           in="path",
      *           description="Article id",
      *           required=false,
      *           @OA\Schema(
@@ -428,7 +428,7 @@ class ArticleController extends Controller
 
             $images = $request->hasFile('images') ? $request->file('images') : [];
 
-            $articleResponse = $this->articleService->updateArticle($id, $articleData, $images);
+            $articleResponse = $this->articleService->updateArticle($id, $articleData, $images, $request->user());
 
             if (isset($articleResponse['error'])) {
                 return ResponseHelper::error($articleResponse['error']);
@@ -442,7 +442,7 @@ class ArticleController extends Controller
 
     /**
      * @OA\Delete (
-     *     path="/articles/{articleid}",
+     *     path="/articles/{articleId}",
      *     tags={"Article"},
      *     summary="Delete article",
      *     description="Delete article",
@@ -450,7 +450,7 @@ class ArticleController extends Controller
      *
      *          @OA\Parameter(
      *           name="articleId",
-     *           in="query",
+     *           in="path",
      *           description="Article id",
      *           required=false,
      *           @OA\Schema(
@@ -494,19 +494,20 @@ class ArticleController extends Controller
      *       )
      * )
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
             if (!$id) {
-                return ResponseHelper::error('Wrong parameter', Response::HTTP_BAD_REQUEST);
+                return ResponseHelper::error('Article id is required', Response::HTTP_BAD_REQUEST);
             }
 
-            $deleted = $this->articleService->deleteArticle($id);
-            if ($deleted) {
-                return ResponseHelper::successData('Article deleted successfully');
-            } else {
-                return ResponseHelper::error('Article not found', Response::HTTP_NOT_FOUND);
+            $deletedResponse = $this->articleService->deleteArticle($id, $request->user());
+
+            if ($deletedResponse['error']) {
+                return ResponseHelper::error($deletedResponse['error']);
             }
+
+            return ResponseHelper::successData($deletedResponse['message']);
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

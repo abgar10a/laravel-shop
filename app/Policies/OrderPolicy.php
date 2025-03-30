@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserTypes;
 use Illuminate\Auth\Access\Response;
 use App\Models\Order;
 use App\Models\User;
@@ -21,7 +22,9 @@ class OrderPolicy
      */
     public function view(User $user, Order $order): bool
     {
-        return false;
+        $userId = $user->id;
+
+        return $userId === $order->user_id || $userId === $order->article()->user_id;
     }
 
     /**
@@ -29,7 +32,7 @@ class OrderPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->user_type == UserTypes::INDIVIDUAL->value;
     }
 
     /**
@@ -37,7 +40,7 @@ class OrderPolicy
      */
     public function update(User $user, Order $order): bool
     {
-        return false;
+        return $user->can('view', $order);
     }
 
     /**
@@ -45,7 +48,7 @@ class OrderPolicy
      */
     public function delete(User $user, Order $order): bool
     {
-        return false;
+        return $user->can('view', $order);
     }
 
     /**

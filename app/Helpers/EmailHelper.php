@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Services;
+namespace App\Helpers;
 
 use App\Mail\MailBuilder;
 use App\Models\Email;
 use Illuminate\Support\Facades\Mail;
 
-class EmailService
+class EmailHelper
 {
-    public function sendEmail($user, $subject, array $data, $template)
+    public static function sendEmail($user, $subject, array $data, $template)
     {
         $email = Email::create([
             'user_id' => $user->id,
