@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('articles', function (Blueprint $table) {
-            $table->double('rating')->default(0);
+        Schema::create('article_review_rel', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('article_id')->constrained('articles');
+            $table->foreignId('review_id')->constrained('reviews');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('articles', function (Blueprint $table) {
-            $table->dropColumn('rating');
-        });
+        Schema::dropIfExists('article_review_rel');
     }
 };
