@@ -13,6 +13,7 @@ use App\Services\AuthService;
 use App\Services\OrderService;
 use App\Services\ReviewService;
 use App\Services\UploadService;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -40,6 +41,9 @@ class AppServiceProvider extends ServiceProvider
         });
         $this->app->singleton(UploadService::class, function ($app) {
             return new UploadService();
+        });
+        $this->app->singleton(UserService::class, function ($app) {
+            return new UserService();
         });
     }
 

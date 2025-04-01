@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('article_review_rel', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('article_id');
-            $table->foreignId('review_id');
+            $table->foreignId('article_id')->constrained('articles');
+            $table->foreignId('review_id')->constrained('reviews');
             $table->timestamps();
         });
     }

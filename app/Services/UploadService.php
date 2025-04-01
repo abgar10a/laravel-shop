@@ -6,16 +6,26 @@ use App\Helpers\ResponseHelper;
 use App\Models\Upload;
 use Illuminate\Support\Facades\Storage;
 
-class UploadService {
+class UploadService
+{
 
-    public function getFile($id) {
-        $upload = Upload::find($id);
+    public function upload($file)
+    {
+        try {
+            $uploadPath = $file->store('articleImages', 'public');
 
-        if (!$upload) {
-            return ResponseHelper::build(error: 'File not found');
+            $upload = Upload::create([
+                'type' => $file->getClientMimeType(),
+                'path' => $uploadPath,
+            ]);
+
+            return ResponseHelper::build('File saved successfully', [
+                'id' => $upload->id,
+                'url' => asset(Storage::url($upload->path)),
+            ]);
+        } catch (\Throwable $th) {
+            return ResponseHelper::build(error: 'Error while saving file');
         }
-
-        return ResponseHelper::build('File successfully retrieved', ['url' => asset(Storage::url($upload->path))]);
     }
 
 }

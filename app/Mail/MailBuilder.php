@@ -4,10 +4,7 @@ namespace App\Mail;
 
 use App\Models\Email;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class MailBuilder extends Mailable
@@ -16,10 +13,10 @@ class MailBuilder extends Mailable
 
     use Queueable, SerializesModels;
 
-    public $email;
-    public $template;
+    public Email $email;
+    public string $template;
 
-    public function __construct(Email $email, $template)
+    public function __construct(Email $email, string $template)
     {
         $this->email = $email;
         $this->template = $template;

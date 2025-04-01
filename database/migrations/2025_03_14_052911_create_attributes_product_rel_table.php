@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('attributes_article_rel', function (Blueprint $table) {
             $table->id();
-            $table->integer('article_id');
-            $table->integer('attribute_id');
+            $table->foreignId('article_id')->constrained('articles');
+            $table->foreignId('attribute_id')->constrained('attributes');
             $table->string('value');
             $table->timestamps();
         });

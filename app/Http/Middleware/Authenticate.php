@@ -5,8 +5,6 @@ namespace App\Http\Middleware;
 use App\Helpers\ResponseHelper;
 use Closure;
 use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use Tymon\JWTAuth\Facades\JWTAuth;
 
 class Authenticate
 {

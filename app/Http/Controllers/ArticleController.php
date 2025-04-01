@@ -22,7 +22,7 @@ class ArticleController extends Controller
      *     tags={"Article"},
      *     summary="Get articles",
      *     description="Get articles",
-     *     security={{"bearerAuth":{}}},
+     *     security={},
      *
      *     @OA\Parameter(
      *          name="page",
@@ -136,11 +136,7 @@ class ArticleController extends Controller
      *                                       @OA\Property(property="user_id", type="integer", example="5555"),
      *                                       @OA\Property(property="color_id", type="integer", example="5"),
      *                                       @OA\Property(property="images", type="array",
-     *                                                   @OA\Items(type="object",
-     *                                                             @OA\Property(property="id", type="integer", example="111"),
-     *                                                             @OA\Property(property="path", type="string", example="image/path"),
-     *                                                             @OA\Property(property="sequence", type="integer", example="1"),
-     *                                                            )
+     *                                                   @OA\Items(type="string", example="1234")
      *                                                   ),
      *                          ),
      *              )
@@ -181,7 +177,7 @@ class ArticleController extends Controller
                 'price' => 'required|numeric|min:0',
                 'user_id' => 'required|exists:users,id',
                 'color_id' => 'required|exists:colors,id',
-                'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'images.*' => 'required|exists:uploads,id',
             ]);
 
             $images = $request->hasFile('images') ? $request->file('images') : [];
@@ -194,7 +190,7 @@ class ArticleController extends Controller
 
             return ResponseHelper::successData('Article saved successfully', $articleResponse, Response::HTTP_CREATED);
         } catch (\Throwable $th) {
-            return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+            return ResponseHelper::error($th->getMessage(), Response::HTTP_BAD_REQUEST);
         }
 
     }
@@ -205,7 +201,7 @@ class ArticleController extends Controller
      *     tags={"Article"},
      *     summary="Get article",
      *     description="Get article",
-     *     security={{"bearerAuth":{}}},
+     *     security={},
      *
      *          @OA\Parameter(
      *           name="articleId",
@@ -519,7 +515,7 @@ class ArticleController extends Controller
      *     tags={"Article"},
      *     summary="Get top articles",
      *     description="Get top articles",
-     *     security={{"bearerAuth":{}}},
+     *     security={},
      *
      *     @OA\Response(
      *         response=200,

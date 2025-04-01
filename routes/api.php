@@ -5,35 +5,41 @@ use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UploadController;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(Authenticate::class)->group(function () {
-    // articles
-    Route::get('articles/top-articles', [ArticleController::class, 'getTopArticles']);
+    Route::apiResource('users', UserController::class)->only([
+        'update', 'destroy'
+    ]);
 
-    Route::apiResource('articles', ArticleController::class);
-
-    // reviews
-    Route::get('reviews/{articleId}', [ReviewController::class, 'index']);
+    Route::apiResource('articles', ArticleController::class)->only([
+        'store', 'update', 'destroy'
+    ]);
 
     Route::apiResource('reviews', ReviewController::class)->only([
         'store', 'update', 'destroy'
     ]);
 
-    // orders
     Route::apiResource('orders', OrderController::class)->only([
         'index', 'store', 'update'
     ]);
 
-    // attributes
     Route::get('attributes/{type}', [AttributeController::class, 'index']);
 
     Route::apiResource('attributes', AttributeController::class)->only([
         'store', 'update', 'destroy'
     ]);
+
+    Route::post('uploads', [UploadController::class, 'store']);
 });
 
-    // uploads
-    Route::get('uploads/{uploadId}', [UploadController::class, 'show']);
+Route::get('articles/top-articles', [ArticleController::class, 'getTopArticles']);
+
+Route::apiResource('articles', ArticleController::class)->only([
+    'index', 'show'
+]);
+
+Route::get('reviews/{articleId}', [ReviewController::class, 'index']);
 

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('password_resets', function (Blueprint $table) {
             $table->id();
-            $table->string('email')->index();
+            $table->string('email');
             $table->string('code');
             $table->timestamp('expires_at');
             $table->boolean('used')->default(false);

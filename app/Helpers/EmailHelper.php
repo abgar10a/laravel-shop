@@ -10,14 +10,20 @@ class EmailHelper
 {
     public static function sendEmail($user, $subject, array $data, $template)
     {
-        $email = Email::create([
-            'user_id' => $user->id,
-            'subject' => $subject,
-            'data' => $data,
-        ]);
+        try {
+            $email = Email::create([
+                'user_id' => $user->id,
+                'subject' => $subject,
+                'data' => $data,
+            ]);
 
-        Mail::to($user->email)->send(new MailBuilder($email, $template));
+            Mail::to($user->email)->send(new MailBuilder($email, $template));
 
-        $email->update(['sent' => true]);
+            $email->update(['sent' => true]);
+
+            return ResponseHelper::build('Email sent', ['email' => $email]);
+        } catch (\Throwable $th) {
+            return ResponseHelper::build(error: 'Email not sent');
+        }
     }
 }

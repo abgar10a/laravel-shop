@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
-use App\Models\Review;
-use App\Http\Requests\UpdateReviewRequest;
 use App\Services\ReviewService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -25,7 +23,7 @@ class ReviewController extends Controller
      *     tags={"Reviews"},
      *     summary="Get reviews",
      *     description="Get reviews for article",
-     *     security={{"bearerAuth":{}}},
+     *     security={},
      *
      *         @OA\Parameter(
      *             name="articleId",
@@ -257,6 +255,39 @@ class ReviewController extends Controller
         }
     }
 
+    /**
+     * @OA\Delete (
+     *     path="/reviews/{reviewId}",
+     *     tags={"Reviews"},
+     *     summary="Delete review",
+     *     description="Delete review",
+     *     security={{"bearerAuth":{}}},
+     *
+     *       @OA\Parameter(
+     *           name="reviewId",
+     *           in="path",
+     *           description="Review id",
+     *           required=false,
+     *           @OA\Schema(
+     *               type="integer",
+     *               default=1,
+     *               example=6
+     *           )
+     *       ),
+     *
+     *     @OA\Response(
+     *         response=201,
+     *         description="Order updated successfully",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Order updated successfully."),
+     *             @OA\Property(property="error", type="boolean", example="false"),
+     *         )
+     *     ),
+     *
+     * )
+     */
     public function destroy(Request $request, $id)
     {
         try {
@@ -270,7 +301,7 @@ class ReviewController extends Controller
                 return ResponseHelper::error($reviewResponse['error'], Response::HTTP_NOT_FOUND);
             }
 
-            return ResponseHelper::successData('Review deleted successfully');
+            return ResponseHelper::success('Review deleted successfully');
         } catch (\Throwable $th) {
             return ResponseHelper::error($th->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

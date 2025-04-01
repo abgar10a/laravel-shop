@@ -7,7 +7,6 @@ use App\Helpers\EmailHelper;
 use App\Helpers\ResponseHelper;
 use App\Models\Article;
 use App\Models\Order;
-use function PHPUnit\Framework\isEmpty;
 
 class OrderService
 {
@@ -61,7 +60,7 @@ class OrderService
 
     public function notifyOrderUpdate($user, $status, $articleId, $urlPath)
     {
-        EmailHelper::sendEmail($user, 'Order status update', [
+        return EmailHelper::sendEmail($user, 'Order status update', [
             'order_status' => $status,
             'article_id' => $articleId,
             'url' => url($urlPath),

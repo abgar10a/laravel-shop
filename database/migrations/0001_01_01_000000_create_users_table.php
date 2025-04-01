@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('city')->nullable();
             $table->string('postal_code')->nullable();
             $table->string('password');
+            $table->foreignId('avatar')->constrained('uploads');
             $table->rememberToken();
             $table->timestamps();
         });

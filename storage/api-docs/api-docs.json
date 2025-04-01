@@ -125,11 +125,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                "security": []
             },
             "post": {
                 "tags": [
@@ -252,21 +248,8 @@
                                                         "images": {
                                                             "type": "array",
                                                             "items": {
-                                                                "properties": {
-                                                                    "id": {
-                                                                        "type": "integer",
-                                                                        "example": "111"
-                                                                    },
-                                                                    "path": {
-                                                                        "type": "string",
-                                                                        "example": "image/path"
-                                                                    },
-                                                                    "sequence": {
-                                                                        "type": "integer",
-                                                                        "example": "1"
-                                                                    }
-                                                                },
-                                                                "type": "object"
+                                                                "type": "string",
+                                                                "example": "1234"
                                                             }
                                                         }
                                                     },
@@ -512,11 +495,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                "security": []
             },
             "put": {
                 "tags": [
@@ -950,11 +929,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                "security": []
             }
         },
         "/auth/login": {
@@ -1975,11 +1950,7 @@
                         }
                     }
                 },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
+                "security": []
             }
         },
         "/reviews": {
@@ -2198,6 +2169,317 @@
                         "bearerAuth": []
                     }
                 ]
+            },
+            "delete": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Delete review",
+                "description": "Delete review",
+                "operationId": "f42c5337c3830603204e8b439ac3b123",
+                "parameters": [
+                    {
+                        "name": "reviewId",
+                        "in": "path",
+                        "description": "Review id",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 6
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Order updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Order updated successfully."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/uploads": {
+            "post": {
+                "tags": [
+                    "Uploads"
+                ],
+                "summary": "Save file",
+                "description": "Save file",
+                "operationId": "c4ab02b33a3b9883561ad49ad37efbb5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "description": "File to upload",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "File saved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Order updated successfully."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "order": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string",
+                                                            "example": "111"
+                                                        },
+                                                        "url": {
+                                                            "type": "string",
+                                                            "example": "url/for/image"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/user/{userId}": {
+            "put": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user",
+                "description": "Update user",
+                "operationId": "7f6a6a971df59d0071c9476d5ad46519",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "user id",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 6
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "user_type",
+                                    "address",
+                                    "city",
+                                    "postal_code",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Robert"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Baghramyan 26"
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "example": "Yerevan"
+                                    },
+                                    "postal_code": {
+                                        "type": "string",
+                                        "example": "80808"
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "example": "123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User updated successfully"
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "user": {
+                                                    "type": "string",
+                                                    "example": "user data..."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The email has already been taken."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update user",
+                "description": "Update user",
+                "operationId": "142f20bb6322894c18aecd61d4fb59c8",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "user id",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1,
+                            "example": 6
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User deleted successfully"
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The email has already been taken."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         }
     },
@@ -2294,6 +2576,14 @@
         {
             "name": "Reviews",
             "description": "Reviews"
+        },
+        {
+            "name": "Uploads",
+            "description": "Uploads"
+        },
+        {
+            "name": "User",
+            "description": "User"
         }
     ]
 }

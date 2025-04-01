@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Helpers\ResponseHelper;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,13 +26,9 @@ class CheckUserRole
                 return $next($request);
             }
 
-            return response()->json([
-                'error' => 'Invalid user type for user : ' . $user->name . ', user type : ' . $user->user_type,
-            ], 404);
+            return ResponseHelper::error('Invalid User Type', Response::HTTP_UNAUTHORIZED);
         }
 
-        return response()->json([
-            'error' => 'User type not defined',
-        ], 404);
+        return ResponseHelper::error('User type not defined', Response::HTTP_UNAUTHORIZED);
     }
 }

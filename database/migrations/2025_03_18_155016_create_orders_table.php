@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('article_id');
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('article_id')->constrained('articles');
             $table->integer('order_quantity');
             $table->double('price')->default(0);
             $table->string('status');

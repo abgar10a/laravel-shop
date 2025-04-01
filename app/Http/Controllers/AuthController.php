@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserTypes;
-use App\Helpers\EmailHelper;
 use App\Helpers\ResponseHelper;
 use App\Services\AuthService;
 use Illuminate\Http\Request;
@@ -259,11 +258,8 @@ class AuthController extends Controller
 
             if (isset($reset['error'])) {
                 return ResponseHelper::error($reset['error'], Response::HTTP_NOT_FOUND);
-            } else {
-                EmailHelper::sendEmail($reset['user'], 'Email confirmation', ['code' => $reset['code']], 'email_confirmation');
-
-                return ResponseHelper::success('Email confirmation sent', Response::HTTP_OK);
             }
+            return ResponseHelper::success('Email confirmation sent', Response::HTTP_OK);
         } catch (\Throwable $th) {
             return ResponseHelper::error("Invalid email");
         }
@@ -407,11 +403,8 @@ class AuthController extends Controller
 
             if (isset($reset['error'])) {
                 return ResponseHelper::error($reset['error'], Response::HTTP_NOT_FOUND);
-            } else {
-                EmailHelper::sendEmail($reset['user'], 'Email confirmation', [], 'password_reset');
-
-                return ResponseHelper::success($reset['message'], Response::HTTP_OK);
             }
+            return ResponseHelper::success($reset['message'], Response::HTTP_OK);
         } catch (\Throwable $th) {
             return ResponseHelper::error("Invalid input");
         }

@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('brand');
             $table->string('name');
             $table->string('quantity');
-            $table->foreignId('type_id')->constrained();
+            $table->foreignId('type_id')->constrained('types');
             $table->decimal('price', 10, 2);
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('color_id')->constrained();
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('color_id')->constrained('colors');
             $table->timestamps();
         });
     }

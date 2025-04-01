@@ -7,7 +7,6 @@ use App\Models\Attribute;
 use App\Models\Relations\AttributeArticleRel;
 use App\Models\Relations\AttributeTypeRel;
 use App\Models\Type;
-use Carbon\Carbon;
 
 class AttributeService
 {
@@ -46,7 +45,8 @@ class AttributeService
         }
     }
 
-    public function updateAttribute($attrData) {
+    public function updateAttribute($attrData)
+    {
         $existing = Attribute::find($attrData['id']);
         if ($existing) {
             unset($attrData['id']);
@@ -58,7 +58,8 @@ class AttributeService
         }
     }
 
-    public function deleteAttribute($id) {
+    public function deleteAttribute($id)
+    {
         $attribute = Attribute::find($id);
 
         if ($attribute) {
