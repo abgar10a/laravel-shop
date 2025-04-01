@@ -14,7 +14,7 @@ This is a Laravel-based online technical shop project. This README provides setu
 ### Step 1: Clone the Repository
 
 ```
-git clone https://github.com/abgar10a/PhpShop.git
+git clone https://github.com/abgar10a/laravel-shop
 cd PhpShop
 ```
 
