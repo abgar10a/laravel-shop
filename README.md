@@ -47,3 +47,11 @@ php artisan migrate
 ```
 php artisan jwt:secret
 ```
+
+### Running the Application
+
+```
+php artisan serve
+```
+
+Your application should be available at http://127.0.0.1:8000/.
