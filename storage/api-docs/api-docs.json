@@ -987,9 +987,9 @@
                                                     "type": "string",
                                                     "example": "ddqwdehwd87287f2dh82hqddd82"
                                                 },
-                                                "refresh_token": {
+                                                "user": {
                                                     "type": "string",
-                                                    "example": "dehwd872sadasfaf872dh82hd82"
+                                                    "example": "user..."
                                                 }
                                             },
                                             "type": "object"
@@ -1104,9 +1104,9 @@
                                                     "type": "string",
                                                     "example": "ddqwdehwd87287f2dh82hqddd82"
                                                 },
-                                                "refresh_token": {
+                                                "user": {
                                                     "type": "string",
-                                                    "example": "dehwd872sadasfaf872dh82hd82"
+                                                    "example": "user..."
                                                 }
                                             },
                                             "type": "object"
@@ -1448,6 +1448,134 @@
                                         "message": {
                                             "type": "string",
                                             "example": "Invalid input."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/auth/{provider}": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Redirect provider",
+                "description": "Redirect provider",
+                "operationId": "afd944da6629ef4d70539af303b037bd",
+                "parameters": [
+                    {
+                        "name": "provider",
+                        "in": "path",
+                        "description": "Provider",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "google",
+                            "example": "github"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Provider redirected"
+                    },
+                    "400": {
+                        "description": "Wrong provider.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Wrong provider."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "true"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": []
+            }
+        },
+        "/auth/{provider}/callback": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Provider callback",
+                "description": "Provider callback",
+                "operationId": "722324a04688ca0b749eaa4498670f45",
+                "parameters": [
+                    {
+                        "name": "provider",
+                        "in": "path",
+                        "description": "Provider",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "google",
+                            "example": "github"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful login",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "User logged in."
+                                        },
+                                        "error": {
+                                            "type": "boolean",
+                                            "example": "false"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "ddqwdehwd87287f2dh82hqddd82"
+                                                },
+                                                "user": {
+                                                    "type": "string",
+                                                    "example": "user..."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Wrong provider.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Wrong provider."
                                         },
                                         "error": {
                                             "type": "boolean",
@@ -2294,14 +2422,14 @@
                 ]
             }
         },
-        "/user/{userId}": {
+        "/users/{userId}": {
             "put": {
                 "tags": [
-                    "User"
+                    "Users"
                 ],
                 "summary": "Update user",
                 "description": "Update user",
-                "operationId": "7f6a6a971df59d0071c9476d5ad46519",
+                "operationId": "41d38a4f8e33cc6adbda34fec285a8e7",
                 "parameters": [
                     {
                         "name": "userId",
@@ -2415,11 +2543,11 @@
             },
             "delete": {
                 "tags": [
-                    "User"
+                    "Users"
                 ],
                 "summary": "Update user",
                 "description": "Update user",
-                "operationId": "142f20bb6322894c18aecd61d4fb59c8",
+                "operationId": "6c232647ae35ae46389c02a869406dcc",
                 "parameters": [
                     {
                         "name": "userId",
@@ -2582,8 +2710,8 @@
             "description": "Uploads"
         },
         {
-            "name": "User",
-            "description": "User"
+            "name": "Users",
+            "description": "Users"
         }
     ]
 }

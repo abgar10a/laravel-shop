@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +15,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/confirm-code', [AuthController::class, 'confirmCode']);
 
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+
+    Route::get('/{provider}', [AuthController::class, 'redirectToProvider']);
+
+    Route::get('/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
 });
 
 

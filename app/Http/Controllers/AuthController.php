@@ -8,6 +8,7 @@ use App\Services\AuthService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
+use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
@@ -48,7 +49,7 @@ class AuthController extends Controller
      *             @OA\Property(property="data",
      *                          type="object",
      *                          @OA\Property(property="token", type="string", example="ddqwdehwd87287f2dh82hqddd82"),
-     *                          @OA\Property(property="refresh_token", type="string", example="dehwd872sadasfaf872dh82hd82"),
+     *                          @OA\Property(property="user", type="string", example="user..."),
      *              )
      *         )
      *     ),
@@ -117,7 +118,7 @@ class AuthController extends Controller
      *             @OA\Property(property="data",
      *                         type="object",
      *                         @OA\Property(property="token", type="string", example="ddqwdehwd87287f2dh82hqddd82"),
-     *                         @OA\Property(property="refresh_token", type="string", example="dehwd872sadasfaf872dh82hd82"),
+     *                         @OA\Property(property="user", type="string", example="user..."),
      *             )
      *         )
      *     ),
@@ -407,6 +408,117 @@ class AuthController extends Controller
             return ResponseHelper::success($reset['message'], Response::HTTP_OK);
         } catch (\Throwable $th) {
             return ResponseHelper::error("Invalid input");
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/auth/{provider}",
+     *     tags={"Auth"},
+     *     summary="Redirect provider",
+     *     description="Redirect provider",
+     *     security={},
+     *
+     *          @OA\Parameter(
+     *           name="provider",
+     *           in="path",
+     *           description="Provider",
+     *           required=false,
+     *           @OA\Schema(
+     *               type="string",
+     *               default="google",
+     *               example="github"
+     *           )
+     *       ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Provider redirected",
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Wrong provider.",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Wrong provider."),
+     *             @OA\Property(property="error", type="boolean", example="true")
+     *         )
+     *     ),
+     *
+     * )
+     */
+    public function redirectToProvider($provider)
+    {
+        try {
+            return Socialite::driver($provider)->stateless()->redirect();
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage(), Response::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/auth/{provider}/callback",
+     *     tags={"Auth"},
+     *     summary="Provider callback",
+     *     description="Provider callback",
+     *     security={},
+     *
+     *          @OA\Parameter(
+     *           name="provider",
+     *           in="path",
+     *           description="Provider",
+     *           required=false,
+     *           @OA\Schema(
+     *               type="string",
+     *               default="google",
+     *               example="github"
+     *           )
+     *       ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Successful login",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="User logged in."),
+     *             @OA\Property(property="error", type="boolean", example="false"),
+     *             @OA\Property(property="data",
+     *                          type="object",
+     *                          @OA\Property(property="token", type="string", example="ddqwdehwd87287f2dh82hqddd82"),
+     *                          @OA\Property(property="user", type="string", example="user..."),
+     *              )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=400,
+     *         description="Wrong provider.",
+     *
+     *         @OA\JsonContent(
+     *
+     *             @OA\Property(property="message", type="string", example="Wrong provider."),
+     *             @OA\Property(property="error", type="boolean", example="true")
+     *         )
+     *     ),
+     *
+     * )
+     */
+    public function handleProviderCallback($provider)
+    {
+        try {
+            $callbackResponse = $this->authService->handleOauthCallback($provider);
+
+            if (isset($callbackResponse['error'])) {
+                return ResponseHelper::error($callbackResponse['error']);
+            }
+
+            return ResponseHelper::successData($callbackResponse['message'], $callbackResponse);
+        } catch (\Throwable $th) {
+            return ResponseHelper::error($th->getMessage(), Response::HTTP_BAD_REQUEST);
         }
     }
 }

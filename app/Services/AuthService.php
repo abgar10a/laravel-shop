@@ -8,7 +8,10 @@ use App\Models\PasswordReset;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
 use Tymon\JWTAuth\Facades\JWTAuth;
+
 class AuthService
 {
     // User Login
@@ -18,7 +21,6 @@ class AuthService
             if ($token = JWTAuth::attempt($credentials)) {
 
                 $user = JWTAuth::user();
-
 
                 return ResponseHelper::build('User logged in successfully', [
                     'token' => $token,
@@ -48,11 +50,7 @@ class AuthService
                 'message' => 'User created successfully',
             ];
         } catch (\Throwable $th) {
-            return [
-                'message' => 'Something went wrong',
-                'error' => $th->getMessage(),
-                'status' => 400
-            ];
+            return ResponseHelper::build(error: 'Something went wrong');
         }
     }
 
@@ -150,5 +148,28 @@ class AuthService
         }
 
         return ResponseHelper::build(error: 'User not found');
+    }
+
+    public function handleOauthCallback($provider)
+    {
+        $socialUser = Socialite::driver($provider)->stateless()->user();
+
+        $user = User::where('email', $socialUser->getEmail())->first();
+
+        if (!$user) {
+            $password = Str::random(16);
+            return $this->register([
+                'email' => $socialUser->getEmail(),
+                'name' => $socialUser->getName(),
+                'password' => Hash::make($password),
+            ]);
+        }
+
+        $token = JWTAuth::fromUser($user);
+
+        return ResponseHelper::build('User logged in successfully', [
+            'token' => $token,
+            'user' => $user,
+        ]);
     }
 }
