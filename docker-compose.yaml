@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shop-app
+    ports:
+      - "8000:8000"
+
+  db:
+    image: mysql:8.0
+    container_name: phpshopdb
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: phpshop
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: abgar97
+      MYSQL_PASSWORD: a96587
+    ports:
+      - "3367:3306"
