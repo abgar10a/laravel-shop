@@ -15,8 +15,10 @@ Route::middleware(Authenticate::class)->group(function () {
     ]);
 
     Route::apiResource('articles', ArticleController::class)->only([
-        'store', 'update', 'destroy'
+        'update', 'destroy'
     ]);
+
+    Route::post('articles', [ArticleController::class, 'store'])->middleware('throttle:articles.store');
 
     Route::apiResource('reviews', ReviewController::class)->only([
         'store', 'update', 'destroy'

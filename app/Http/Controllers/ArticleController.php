@@ -172,7 +172,7 @@ class ArticleController extends Controller
             $articleData = $request->validate([
                 'brand' => 'required|string|max:255',
                 'name' => 'required|string|max:255',
-                'quantity' => 'required|string|max:255',
+                'quantity' => 'required|numeric|max:255',
                 'type_id' => 'required|exists:types,id',
                 'price' => 'required|numeric|min:0',
                 'user_id' => 'required|exists:users,id',

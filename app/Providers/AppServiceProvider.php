@@ -2,19 +2,21 @@
 
 namespace App\Providers;
 
+use App\Helpers\ResponseHelper;
 use App\Models\Article;
 use App\Models\Order;
-use App\Models\Review;
 use App\Policies\ArticlePolicy;
 use App\Policies\OrderPolicy;
-use App\Policies\ReviewPolicy;
 use App\Services\ArticleService;
 use App\Services\AuthService;
 use App\Services\OrderService;
 use App\Services\ReviewService;
 use App\Services\UploadService;
 use App\Services\UserService;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -54,5 +56,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Gate::policy(Article::class, ArticlePolicy::class);
         Gate::policy(Order::class, OrderPolicy::class);
+        RateLimiter::for('articles.store', function (Request $request) {
+            return env('APP_TEST') ? Limit::none()
+                : ($request->user()->isUserVip() ? Limit::perDay(3) : Limit::perDay(1))
+                    ->response(function () {
+                        return ResponseHelper::error('Too many daily requests for user.', 429);
+                    });
+        });
     }
 }
