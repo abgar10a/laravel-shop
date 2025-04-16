@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\UserTypes;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\OrderController;
@@ -7,6 +8,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\CheckUserRole;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(Authenticate::class)->group(function () {
@@ -18,7 +20,7 @@ Route::middleware(Authenticate::class)->group(function () {
         'update', 'destroy'
     ]);
 
-    Route::post('articles', [ArticleController::class, 'store'])->middleware('throttle:articles.store');
+    Route::post('articles', [ArticleController::class, 'store'])->middleware(['throttle:articles.store', CheckUserRole::class.':'.implode(',', UserTypes::businessTypes())]);
 
     Route::apiResource('reviews', ReviewController::class)->only([
         'store', 'update', 'destroy'

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Events\ArticleProcessed;
 use App\Helpers\EmailHelper;
 use App\Helpers\ResponseHelper;
 use App\Models\Article;
@@ -31,7 +32,8 @@ class OrderService
             $orderData['order_date'] = now();
             $order = Order::create($orderData);
 
-            $this->notifyOrderUpdate(auth()->user(), OrderStatus::DELIVERING, $order->article_id, '/');
+//            $this->notifyOrderUpdate(auth()->user(), OrderStatus::DELIVERING, $order->article_id, '/');
+            $this->notifyOrderUpdate($order);
 
             return ResponseHelper::build('Order created successfully', ['order' => $order]);
         }
@@ -53,17 +55,13 @@ class OrderService
             'status' => $status
         ]);
 
-        $this->notifyOrderUpdate(auth()->user(), $status, $order->article_id, '/');
+        $this->notifyOrderUpdate($order);
 
         return ResponseHelper::build('Order updated successfully', ['order' => $order]);
     }
 
-    public function notifyOrderUpdate($user, $status, $articleId, $urlPath)
+    public function notifyOrderUpdate($order)
     {
-        return EmailHelper::sendEmail($user, 'Order status update', [
-            'order_status' => $status,
-            'article_id' => $articleId,
-            'url' => url($urlPath),
-        ], 'order_status');
+        return event(new ArticleProcessed($order));
     }
 }

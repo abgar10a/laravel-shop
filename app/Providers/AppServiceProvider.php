@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Helpers\ResponseHelper;
+use App\Listeners\ArticleStatusNotification;
 use App\Models\Article;
 use App\Models\Order;
 use App\Policies\ArticlePolicy;
@@ -15,6 +16,7 @@ use App\Services\UploadService;
 use App\Services\UserService;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
@@ -63,5 +65,8 @@ class AppServiceProvider extends ServiceProvider
                         return ResponseHelper::error('Too many daily requests for user.', 429);
                     });
         });
+        Event::listen([
+            ArticleStatusNotification::class
+        ]);
     }
 }

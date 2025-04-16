@@ -25,6 +25,11 @@ class Order extends Model
         return $this->belongsTo(Article::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class)->first();
+    }
+
     public static function getOrdersByUserId($userId)
     {
         $ordersQuery = Order::select('id', 'article_id', 'status', 'price', 'order_quantity', 'order_date', 'delivery_date')
@@ -58,7 +63,8 @@ class Order extends Model
         ];
     }
 
-    public static function getOrderedArticleQuantity($articleId) {
+    public static function getOrderedArticleQuantity($articleId)
+    {
         $order = Order::where('article_id', $articleId);
         if ($order) {
             return $order->sum('order_quantity');
