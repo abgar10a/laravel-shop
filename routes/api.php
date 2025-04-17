@@ -4,6 +4,7 @@ use App\Enums\UserTypes;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RedisController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UploadController;
 use App\Http\Controllers\UserController;
@@ -37,6 +38,10 @@ Route::middleware(Authenticate::class)->group(function () {
     ]);
 
     Route::post('uploads', [UploadController::class, 'store']);
+
+    Route::get('redis', [RedisController::class, 'show']);
+    Route::post('redis', [RedisController::class, 'store']);
+
 });
 
 Route::get('articles/top-articles', [ArticleController::class, 'getTopArticles']);
@@ -46,4 +51,7 @@ Route::apiResource('articles', ArticleController::class)->only([
 ]);
 
 Route::get('reviews/{articleId}', [ReviewController::class, 'index']);
+
+
+
 

@@ -2,7 +2,14 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ArticleProcessType;
 use App\Models\Article;
+use App\Models\ArticleHistory;
+use App\Models\Color;
+use App\Models\Relations\ArticleImageRel;
+use App\Models\Upload;
+use App\Models\User;
+use Faker\Factory;
 use Illuminate\Database\Seeder;
 
 class ArticleSeeder extends Seeder
@@ -12,7 +19,7 @@ class ArticleSeeder extends Seeder
      */
     public function run()
     {
-        $faker = \Faker\Factory::create();
+        $faker = Factory::create();
 
         // Random brands for different categories
         $brands = [
@@ -44,12 +51,9 @@ class ArticleSeeder extends Seeder
             'Dell UltraSharp U2720Q', 'ViewSonic Elite XG270QG', 'Gigabyte AORUS FI27Q', 'EIZO ColorEdge CG319X', 'Philips 278E1A'
         ];
 
-        // Iterate and insert data
         for ($i = 0; $i < 50; $i++) {
-            // Randomly assign a product type
             $typeId = rand(1, 4); // 1-Laptops, 2-Phones, 3-Headphones, 4-Displays
 
-            // Assign the correct model based on the type
             switch ($typeId) {
                 case 1:
                     $model = $faker->randomElement($laptopModels);
@@ -69,11 +73,11 @@ class ArticleSeeder extends Seeder
             $brand = $faker->randomElement($brands);
 
             // Get random user_id and color_id
-            $userId = \App\Models\User::inRandomOrder()->first()->id;
-            $colorId = \App\Models\Color::inRandomOrder()->first()->id;
+            $userId = User::inRandomOrder()->first()->id;
+            $colorId = Color::inRandomOrder()->first()->id;
 
             // Insert the record
-            Article::create([
+            $article = Article::create([
                 'brand' => $brand,
                 'name' => $model,
                 'quantity' => $faker->numberBetween(1, 100),
@@ -82,6 +86,24 @@ class ArticleSeeder extends Seeder
                 'user_id' => $userId,
                 'color_id' => $colorId,
             ]);
+
+
+            ArticleHistory::create([
+               'article_id' => $article->id,
+               'user_id' => $userId,
+               'action' => ArticleProcessType::ADDED->value,
+               'quantity' => $article->quantity,
+            ]);
+
+            $imageCount = rand(1, 3);
+            for ($j = 0; $j < $imageCount; $j++) {
+                $imageId = Upload::inRandomOrder()->first()->id;
+                ArticleImageRel::create([
+                    'article_id' => $article->id,
+                    'upload_id' => $imageId,
+                    'sequence' => $j + 1,
+                ]);
+            }
         }
     }
 

@@ -6,6 +6,7 @@ use App\Models\Relations\ArticleImageRel;
 use App\Models\Upload;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class RemoveUnusedImages extends Command
 {
@@ -14,7 +15,7 @@ class RemoveUnusedImages extends Command
      *
      * @var string
      */
-    protected $signature = 'images:cleanup';
+    protected $signature = 'images:cleanup {--force : Confirm cleanup without prompt}';
 
     /**
      * The console command description.
@@ -28,9 +29,25 @@ class RemoveUnusedImages extends Command
      */
     public function handle()
     {
+
         $usedUploadIds = ArticleImageRel::pluck('upload_id');
 
         $unusedUploads = Upload::whereNotIn('id', $usedUploadIds)->get();
+
+        $removeConfirmed = $this->hasOption('force') || $this->ask(
+                count($unusedUploads) . " unused images found.\n Do you want to remove them? y/n") === 'y';
+
+        if (!$removeConfirmed) {
+            $this->info("Cleaning up canceled.");
+            return CommandAlias::SUCCESS;
+        } else if (count($unusedUploads) < 1) {
+            $this->info("Unused images not found.");
+            return CommandAlias::SUCCESS;
+        }
+
+        $bar = $this->output->createProgressBar(count($unusedUploads));
+
+        $bar->start();
 
         foreach ($unusedUploads as $upload) {
             $imagePath = 'app/public/' . $upload->path;
@@ -41,10 +58,12 @@ class RemoveUnusedImages extends Command
             }
 
             $upload->delete();
-            $this->info("Deleted DB entry: ID " . $upload->id);
+            $bar->advance();
         }
 
+        $bar->finish();
+        $bar->clear();
         $this->info("Unused uploads removed.");
-
+        return CommandAlias::SUCCESS;
     }
 }

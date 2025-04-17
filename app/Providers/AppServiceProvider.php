@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Listeners\ArticleStatusNotification;
 use App\Models\Article;
 use App\Models\Order;
+use App\Observers\OrderObserver;
 use App\Policies\ArticlePolicy;
 use App\Policies\OrderPolicy;
 use App\Services\ArticleService;
@@ -68,5 +69,6 @@ class AppServiceProvider extends ServiceProvider
         Event::listen([
             ArticleStatusNotification::class
         ]);
+        Order::observe(OrderObserver::class);
     }
 }

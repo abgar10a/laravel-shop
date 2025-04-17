@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('brand');
             $table->string('name');
-            $table->string('quantity');
+            $table->integer('quantity');
             $table->foreignId('type_id')->constrained('types');
             $table->decimal('price', 10, 2);
             $table->double('rating')->default(0);

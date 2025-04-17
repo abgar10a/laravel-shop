@@ -8,6 +8,7 @@ use App\Helpers\EmailHelper;
 use App\Helpers\ResponseHelper;
 use App\Models\Article;
 use App\Models\Order;
+use Illuminate\Support\Facades\DB;
 
 class OrderService
 {
@@ -25,20 +26,32 @@ class OrderService
 
     public function createOrder($orderData)
     {
-        if ($article = Article::find($orderData['article_id'])) {
+        return DB::transaction(function () use ($orderData) {
+
+            $article = Article::where('id', $orderData['article_id'])
+                ->lockForUpdate()
+                ->first();
+
+            if (!$article) {
+                return ResponseHelper::build(error: "Article not found");
+            }
+
+            if ($article->quantity < $orderData['order_quantity']) {
+                return ResponseHelper::build(error: "Not enough stock available");
+            }
+
             $orderData['user_id'] = auth()->id();
             $orderData['price'] = $orderData['order_quantity'] * $article->price;
             $orderData['status'] = OrderStatus::DELIVERING;
             $orderData['order_date'] = now();
+
             $order = Order::create($orderData);
 
-//            $this->notifyOrderUpdate(auth()->user(), OrderStatus::DELIVERING, $order->article_id, '/');
-            $this->notifyOrderUpdate($order);
+            $article->quantity = (int)$article->quantity - $orderData['order_quantity'];
+            $article->save();
 
             return ResponseHelper::build('Order created successfully', ['order' => $order]);
-        }
-
-        return ResponseHelper::build(error: "Article not found");
+        });
     }
 
     public function updateOrder($user, $orderId, $status)
@@ -54,8 +67,6 @@ class OrderService
         $order->update([
             'status' => $status
         ]);
-
-        $this->notifyOrderUpdate($order);
 
         return ResponseHelper::build('Order updated successfully', ['order' => $order]);
     }

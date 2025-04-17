@@ -26,11 +26,12 @@ class RemoveUnusedEmails extends Command
      */
     public function handle()
     {
-        $email = Email::where('sent', 1)->orderBy('id', 'desc')->first();
-
-        if ($email) {
-            $email->delete();
-            logger()->info('Email have been removed. ID : ' . $email->id);
-        }
+        Email::where('sent', 1)
+            ->orderBy('id')
+            ->cursor()
+            ->each(function (Email $email) {
+                $email->delete();
+            });
+        echo "Emails have been cleaned\n";
     }
 }
