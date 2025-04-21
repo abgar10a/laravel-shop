@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Helpers\ResponseHelper;
 use App\Listeners\ArticleStatusNotification;
+use App\Listeners\OrderToSellerNotification;
 use App\Models\Article;
 use App\Models\Order;
 use App\Observers\OrderObserver;
@@ -19,8 +20,10 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -57,8 +60,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // policies
         Gate::policy(Article::class, ArticlePolicy::class);
         Gate::policy(Order::class, OrderPolicy::class);
+
+        // limiters
         RateLimiter::for('articles.store', function (Request $request) {
             return env('APP_TEST') ? Limit::none()
                 : ($request->user()->isUserVip() ? Limit::perDay(3) : Limit::perDay(1))
@@ -66,9 +72,14 @@ class AppServiceProvider extends ServiceProvider
                         return ResponseHelper::error('Too many daily requests for user.', 429);
                     });
         });
+
+        // listeners
         Event::listen([
-            ArticleStatusNotification::class
+            ArticleStatusNotification::class,
+            OrderToSellerNotification::class
         ]);
+
+        // observers
         Order::observe(OrderObserver::class);
     }
 }

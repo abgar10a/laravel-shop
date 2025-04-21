@@ -24,6 +24,11 @@ class Article extends Model
         'rating'
     ];
 
+    public function user() : User
+    {
+        return $this->belongsTo(User::class)->first();
+    }
+
     public function images()
     {
         return $this->hasManyThrough(

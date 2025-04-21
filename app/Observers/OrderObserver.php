@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Enums\ArticleProcessType;
 use App\Enums\OrderStatus;
 use App\Events\ArticleProcessed;
+use App\Jobs\ProcessOrder;
 use App\Models\ArticleHistory;
 use App\Models\Order;
 
@@ -23,6 +24,7 @@ class OrderObserver
             'quantity' => $order->order_quantity,
         ]);
         event(new ArticleProcessed($order));
+        ProcessOrder::dispatch($order);
     }
 
     /**

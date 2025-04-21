@@ -70,9 +70,4 @@ class OrderService
 
         return ResponseHelper::build('Order updated successfully', ['order' => $order]);
     }
-
-    public function notifyOrderUpdate($order)
-    {
-        return event(new ArticleProcessed($order));
-    }
 }

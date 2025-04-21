@@ -20,12 +20,12 @@ class Order extends Model
         'price'
     ];
 
-    public function article()
+    public function article(): Article
     {
-        return $this->belongsTo(Article::class);
+        return $this->belongsTo(Article::class)->first();
     }
 
-    public function user()
+    public function user(): User
     {
         return $this->belongsTo(User::class)->first();
     }

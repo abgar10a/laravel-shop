@@ -2,12 +2,13 @@
 
 namespace App\Listeners;
 
-use App\Events\ArticleProcessed;
+use App\Events\OrderPrepare;
 use App\Helpers\EmailHelper;
+use http\Client\Curl\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class ArticleStatusNotification implements ShouldQueue
+class OrderToSellerNotification implements ShouldQueue
 {
 
     public $connection = 'sync';
@@ -25,14 +26,18 @@ class ArticleStatusNotification implements ShouldQueue
     /**
      * Handle the event.
      */
-    public function handle(ArticleProcessed $event): void
+    public function handle(OrderPrepare $event): void
     {
         $order = $event->order;
+        $article = $order->article();
         $user = $order->user();
-        EmailHelper::sendEmail($user, 'Order status update', [
-            'order_status' => $order->status,
+        $seller = $article->user();
+        EmailHelper::sendEmail($seller, 'New order', [
             'article_id' => $order->article_id,
+            'model' => $article->brand . ' ' . $article->name,
+            'quantity' => $order->order_quantity,
+            'address' => $user->city . ' ' . $user->address . ' ' . $user->postal_code,
             'url' => url("api/orders/$order->id"),
-        ], 'order_status');
+        ], 'order_seller');
     }
 }
