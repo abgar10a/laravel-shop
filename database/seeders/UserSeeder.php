@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         // Create 50 users
         foreach (range(1, 50) as $index) {
             $name = $faker->firstName . ' ' . $faker->lastName;
-            $password = bcrypt($name . $faker->regexify('[a-zA-Z0-9]{10}')); // Password is name + random string
+            $password = '12345678';
 
             User::create([
                 'name' => $name,
@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
                 'address' => $faker->address,
                 'city' => $faker->city,
                 'postal_code' => $faker->postcode,
-                'password' => $password, // Hashed password
+                'password' => $password,
             ]);
         }
     }

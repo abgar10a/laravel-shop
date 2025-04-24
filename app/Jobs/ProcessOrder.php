@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Events\ArticleProcessed;
 use App\Events\OrderPrepare;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
@@ -25,16 +24,5 @@ class ProcessOrder implements ShouldQueue
     {
         logger('Inside job: ProcessOrder for order ID ' . $this->order->id);
         event(new OrderPrepare($this->order));
-
-//        $order = $this->order;
-//        $article = $order->article();
-//        $user = $article->seller();
-//        EmailHelper::sendEmail($user, 'New order', [
-//            'article_id' => $order->article_id,
-//            'model' => $article->brand . ' ' . $article->model,
-//            'quantity' => $order->order_quantity,
-//            'address' => $order->user()->address,
-//            'url' => url("api/orders/$order->id"),
-//        ], 'order_seller');
     }
 }

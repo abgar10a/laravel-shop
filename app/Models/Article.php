@@ -44,7 +44,7 @@ class Article extends Model
 
     public function reviews()
     {
-        return $this->hasMany(Review::class, 'article_id', 'id');
+        return $this->hasMany(Review::class);
     }
 
     public function attributes()

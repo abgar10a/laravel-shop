@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::middleware('guest')->group(function () {
-    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register', [AuthController::class, 'register'])->block(2, 2);
 
     Route::post('/login', [AuthController::class, 'login']);
 

@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Services\ArticleService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Cookie;
 
 class ArticleController extends Controller
 {
@@ -85,7 +86,7 @@ class ArticleController extends Controller
 
             return ResponseHelper::successData($articleResponse['message'], $articleResponse);
         } catch (\Throwable $th) {
-            return ResponseHelper::error('Something went wrong');
+            return ResponseHelper::error($th->getMessage());
         }
     }
 

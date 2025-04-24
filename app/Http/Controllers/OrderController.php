@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\OrderStatus;
+use App\Exceptions\OrderAddressMissingException;
 use App\Helpers\ResponseHelper;
 use App\Models\Order;
 use App\Services\OrderService;

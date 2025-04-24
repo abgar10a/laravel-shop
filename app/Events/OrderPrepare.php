@@ -33,7 +33,7 @@ class OrderPrepare
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('place-order'.$this->order->id),
+            new PrivateChannel('seller'.$this->order->id),
         ];
     }
 }

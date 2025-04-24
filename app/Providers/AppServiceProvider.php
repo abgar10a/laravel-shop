@@ -7,7 +7,9 @@ use App\Listeners\ArticleStatusNotification;
 use App\Listeners\OrderToSellerNotification;
 use App\Models\Article;
 use App\Models\Order;
+use App\Models\Review;
 use App\Observers\OrderObserver;
+use App\Observers\ReviewObserver;
 use App\Policies\ArticlePolicy;
 use App\Policies\OrderPolicy;
 use App\Services\ArticleService;
@@ -20,39 +22,27 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Passport\Passport;
 
 class AppServiceProvider extends ServiceProvider
 {
+
+    public $singletons = [
+        ArticleService::class => ArticleService::class,
+        OrderService::class => OrderService::class,
+        AuthService::class => AuthService::class,
+        ReviewService::class => ReviewService::class,
+        UserService::class => UserService::class,
+        UploadService::class => UploadService::class,
+    ];
+
     /**
      * Register any application services.
      */
     public function register(): void
     {
-        $this->app->singleton(ArticleService::class, function ($app) {
-            return new ArticleService();
-        });
-        $this->app->singleton(AuthService::class, function ($app) {
-            return new AuthService();
-        });
-        $this->app->singleton(ReviewService::class, function ($app) {
-            return new ReviewService();
-        });
-        $this->app->singleton(OrderService::class, function ($app) {
-            return new OrderService();
-        });
-        $this->app->singleton(ArticleService::class, function ($app) {
-            return new ArticleService();
-        });
-        $this->app->singleton(UploadService::class, function ($app) {
-            return new UploadService();
-        });
-        $this->app->singleton(UserService::class, function ($app) {
-            return new UserService();
-        });
+
     }
 
     /**
@@ -81,5 +71,6 @@ class AppServiceProvider extends ServiceProvider
 
         // observers
         Order::observe(OrderObserver::class);
+        Review::observe(ReviewObserver::class);
     }
 }

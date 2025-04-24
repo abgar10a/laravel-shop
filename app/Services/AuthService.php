@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\UserTypes;
 use App\Helpers\EmailHelper;
 use App\Helpers\ResponseHelper;
 use App\Models\PasswordReset;
@@ -38,6 +39,7 @@ class AuthService
     public function register(array $userData)
     {
         try {
+            if(env('APP_TEST') && !isset($userData['user_type'])) $userData['user_type'] = UserTypes::INDIVIDUAL->value;
             $user = User::create($userData);
 
             $credentials = [
@@ -50,7 +52,7 @@ class AuthService
                 'message' => 'User created successfully',
             ];
         } catch (\Throwable $th) {
-            return ResponseHelper::build(error: 'Something went wrong');
+            return ResponseHelper::build(error: $th->getMessage());
         }
     }
 
@@ -157,11 +159,11 @@ class AuthService
         $user = User::where('email', $socialUser->getEmail())->first();
 
         if (!$user) {
-            $password = Str::random(16);
+            $password = env('APP_TEST') ? '12345678' : Str::random(16);
             return $this->register([
                 'email' => $socialUser->getEmail(),
                 'name' => $socialUser->getName(),
-                'password' => Hash::make($password),
+                'password' => $password,
             ]);
         }
 

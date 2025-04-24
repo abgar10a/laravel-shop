@@ -3,8 +3,7 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
-use App\Events\ArticleProcessed;
-use App\Helpers\EmailHelper;
+use App\Exceptions\OrderAddressMissingException;
 use App\Helpers\ResponseHelper;
 use App\Models\Article;
 use App\Models\Order;
@@ -24,8 +23,15 @@ class OrderService
         return ResponseHelper::build('Orders for page ' . $orders['current_page'], $orders);
     }
 
+    /**
+     * @throws OrderAddressMissingException
+     */
     public function createOrder($orderData)
     {
+        if (empty(auth()->user()->address)) {
+            throw new OrderAddressMissingException('Customer address missing');
+        }
+
         return DB::transaction(function () use ($orderData) {
 
             $article = Article::where('id', $orderData['article_id'])
