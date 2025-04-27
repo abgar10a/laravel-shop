@@ -19,6 +19,10 @@ class Review extends Model
         'comment',
     ];
 
+    public function reviewable() {
+        return $this->morphTo();
+    }
+
     public function article()
     {
         return $this->belongsTo(Article::class, 'article_id', 'id');

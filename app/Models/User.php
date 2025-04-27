@@ -73,6 +73,10 @@ class User extends Authenticatable implements JWTSubject
         ];
     }
 
+    public function reviews (){
+        return $this->morphMany(Review::class, 'reviewable');
+    }
+
     public function isUserVip()
     {
         return $this->user_type === UserTypes::BUSINESS_VIP->value;

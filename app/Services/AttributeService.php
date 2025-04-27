@@ -10,9 +10,9 @@ use App\Models\Type;
 
 class AttributeService
 {
-    public function getAttributesByType($typeName)
+    public function getAttributesByType($typeIdentifier)
     {
-        $type = Type::where('name', $typeName)->first();
+        $type = Type::where('identifier', $typeIdentifier)->first();
 
         if ($type) {
             $attributes = $type->attributes->makeHidden('pivot');
@@ -29,7 +29,7 @@ class AttributeService
         if ($existing) {
             return ResponseHelper::build(error: 'Attribute already exists');
         } else {
-            $type = Type::where('name', $attrData['type'])->first();
+            $type = Type::where('identifier', $attrData['type'])->first();
             if ($type) {
                 unset($attrData['type']);
                 $attribute = Attribute::create($attrData);

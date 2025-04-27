@@ -6,7 +6,7 @@ use App\Models\Relations\ArticleImageRel;
 use App\Models\Relations\AttributeArticleRel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Article extends Model
 {
@@ -20,13 +20,17 @@ class Article extends Model
         'type_id',
         'price',
         'user_id',
-        'color_id',
         'rating'
     ];
 
     public function user() : User
     {
         return $this->belongsTo(User::class)->first();
+    }
+
+    public function colors()
+    {
+        return $this->belongsToMany(Color::class, 'article_color');
     }
 
     public function images()
@@ -42,9 +46,9 @@ class Article extends Model
             ->orderBy('article_image_rel.sequence');
     }
 
-    public function reviews()
+    public function reviews(): MorphMany
     {
-        return $this->hasMany(Review::class);
+        return $this->morphMany(Review::class, 'reviewable');
     }
 
     public function attributes()

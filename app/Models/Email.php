@@ -23,6 +23,6 @@ class Email extends Model
 
     public function prunable()
     {
-        return Email::query()->where('sent', '=', true);
+        return Email::query()->where('sent', true);
     }
 }

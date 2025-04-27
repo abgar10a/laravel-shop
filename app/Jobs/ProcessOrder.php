@@ -22,7 +22,7 @@ class ProcessOrder implements ShouldQueue
 
     public function handle(): void
     {
-        logger('Inside job: ProcessOrder for order ID ' . $this->order->id);
+        logger('Process for order ID ' . $this->order->id);
         event(new OrderPrepare($this->order));
     }
 }
