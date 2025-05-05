@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table("users", function (Blueprint $table) {
-            $table->double('rating')->default(0)->after('user_type');
+            $table->float('rating')->default(0)->after('user_type');
         });
     }
 

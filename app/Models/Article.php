@@ -7,11 +7,11 @@ use App\Models\Relations\AttributeArticleRel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Laravel\Scout\Searchable;
 
 class Article extends Model
 {
-    /** @use HasFactory<\Database\Factories\ArticleFactory> */
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected $fillable = [
         'brand',
@@ -23,7 +23,7 @@ class Article extends Model
         'rating'
     ];
 
-    public function user() : User
+    public function user(): User
     {
         return $this->belongsTo(User::class)->first();
     }
@@ -60,11 +60,12 @@ class Article extends Model
             'id',
             'id',
             'attribute_id'
-        )->select(['attributes.id', 'attributes.identifier',  'attributes.title', 'attributes_article_rel.value']);
+        )->select(['attributes.id', 'attributes.identifier', 'attributes.title', 'attributes_article_rel.value']);
     }
 
-    public function reviewsWithUser(){
-        return $this->reviews->map(function ($review){
+    public function reviewsWithUser()
+    {
+        return $this->reviews->map(function ($review) {
             return [
                 'id' => $review->id,
                 'rating' => $review->rating,
@@ -75,5 +76,40 @@ class Article extends Model
                 ],
             ];
         });
+    }
+
+    public function scopePrice($query, $minPrice, $maxPrice)
+    {
+        return $query->whereBetween('price', [$minPrice, $maxPrice]);
+    }
+
+    public function scopeRating($query, $rating)
+    {
+        return $query->where('rating', $rating);
+    }
+
+    public function scopeInStock($query, $quantity = 0)
+    {
+        return $query->where('quantity', '>', max($quantity - 1, 0));
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->where(function ($query) use ($search) {
+            $query->whereRaw('LOWER(CONCAT(brand, " ", name)) LIKE ?', ['%' . strtolower($search) . '%']);
+        });
+    }
+
+    public function searchableAs()
+    {
+        return 'articles';
+    }
+
+    public function toSearchableArray(): array
+    {
+        return array_merge($this->toArray(), [
+            'id' => (string)$this->id,
+            'created_at' => $this->created_at->timestamp,
+        ]);
     }
 }

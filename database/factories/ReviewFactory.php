@@ -19,10 +19,10 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'article_id' => Article::inRandomOrder()->first()->id,
-            'user_id' => User::inRandomOrder()->first()->id,
             'rating' => $this->faker->numberBetween(1, 5),
             'comment' => $this->faker->sentence(),
+            'reviewable_type' => Article::class,
+            'reviewable_id' => Article::inRandomOrder()->first()->id,
         ];
     }
 }

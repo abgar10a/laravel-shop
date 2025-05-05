@@ -5,12 +5,12 @@ namespace Database\Seeders;
 use App\Enums\ArticleProcessType;
 use App\Models\Article;
 use App\Models\ArticleHistory;
-use App\Models\Color;
 use App\Models\Relations\ArticleImageRel;
 use App\Models\Upload;
 use App\Models\User;
 use Faker\Factory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ArticleSeeder extends Seeder
 {
@@ -74,7 +74,11 @@ class ArticleSeeder extends Seeder
 
             // Get random user_id and color_id
             $userId = User::inRandomOrder()->first()->id;
-            $colorId = Color::inRandomOrder()->first()->id;
+            $colorIds = [
+                $faker->numberBetween(1, 10),
+                $faker->numberBetween(1, 10),
+                $faker->numberBetween(1, 10),
+            ];
 
             // Insert the record
             $article = Article::create([
@@ -84,7 +88,6 @@ class ArticleSeeder extends Seeder
                 'type_id' => $typeId,
                 'price' => $faker->randomFloat(2, 10, 1000),
                 'user_id' => $userId,
-                'color_id' => $colorId,
             ]);
 
 
@@ -95,7 +98,16 @@ class ArticleSeeder extends Seeder
                'quantity' => $article->quantity,
             ]);
 
-            $imageCount = rand(1, 3);
+            foreach ($colorIds as $colorId) {
+                DB::table('article_color')->insert([
+                    'article_id' => $article->id,
+                    'color_id' => $colorId,
+                    'created_at' => \Symfony\Component\Clock\now(),
+                    'updated_at' => \Symfony\Component\Clock\now()
+                ]);
+            }
+
+            $imageCount = random_int(1, 3);
             for ($j = 0; $j < $imageCount; $j++) {
                 $imageId = Upload::inRandomOrder()->first()->id;
                 ArticleImageRel::create([

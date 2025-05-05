@@ -84,7 +84,7 @@
                                                             },
                                                             "rating": {
                                                                 "type": "number",
-                                                                "format": "double",
+                                                                "format": "float",
                                                                 "example": "4.5"
                                                             },
                                                             "image": {
@@ -888,7 +888,7 @@
                                                             },
                                                             "rating": {
                                                                 "type": "number",
-                                                                "format": "double",
+                                                                "format": "float",
                                                                 "example": "4.5"
                                                             },
                                                             "image": {

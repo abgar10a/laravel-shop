@@ -6,7 +6,6 @@ use App\Helpers\ResponseHelper;
 use App\Services\ArticleService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Cookie;
 
 class ArticleController extends Controller
 {
@@ -54,7 +53,7 @@ class ArticleController extends Controller
      *                                    @OA\Property(property="brand", type="string", example="Brand"),
      *                                    @OA\Property(property="name", type="string", example="Model name"),
      *                                    @OA\Property(property="price", type="double", example="33.33"),
-     *                                    @OA\Property(property="rating", type="double", example="4.5"),
+     *                                    @OA\Property(property="rating", type="float", example="4.5"),
      *                                    @OA\Property(property="image", type="string", example="path/to/image"),
      *                                   )
      *                          ),
@@ -77,8 +76,12 @@ class ArticleController extends Controller
     public function index(Request $request)
     {
         try {
-            $page = (int)$request->has('page') ?: 0;
-            $articleResponse = $this->articleService->getArticles($page);
+            $articleResponse = $this->articleService
+                ->getArticles(
+                    $request->query('page', 1),
+                    $request->query('perPage', 10),
+                    $request->query('filter', []),
+                    $request->query('order', []));
 
             if (isset($articleResponse['error'])) {
                 return ResponseHelper::error($articleResponse['error']);
@@ -534,7 +537,7 @@ class ArticleController extends Controller
      *                                    @OA\Property(property="brand", type="string", example="Brand"),
      *                                    @OA\Property(property="name", type="string", example="Model name"),
      *                                    @OA\Property(property="price", type="double", example="33.33"),
-     *                                    @OA\Property(property="rating", type="double", example="4.5"),
+     *                                    @OA\Property(property="rating", type="float", example="4.5"),
      *                                    @OA\Property(property="image", type="string", example="path/to/image"),
      *                                   )
      *                          ),

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\OrderStatus;
 use App\Exceptions\OrderAddressMissingException;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\StoreOrderRequest;
 use App\Models\Order;
 use App\Services\OrderService;
 use Illuminate\Http\Request;
@@ -172,17 +173,14 @@ class OrderController extends Controller
      *      ),
      * )
      */
-    public function store(Request $request)
+    public function store(StoreOrderRequest $request)
     {
         try {
             if ($request->user()->cannot('create', Order::class)) {
                 return ResponseHelper::error("You don't have permission to create orders");
             }
 
-            $orderData = $request->validate([
-                'article_id' => 'required|exists:articles,id',
-                'order_quantity' => 'required|integer|min:1',
-            ]);
+            $orderData = $request->validated();
 
             $orderResponse = $this->orderService->createOrder($orderData);
 

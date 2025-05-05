@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->integer('quantity');
             $table->foreignId('type_id')->constrained('types');
             $table->decimal('price', 10, 2);
-            $table->double('rating')->default(0);
+            $table->float('rating')->default(0);
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('color_id')->constrained('colors');
             $table->timestamps();

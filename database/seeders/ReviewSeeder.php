@@ -17,7 +17,7 @@ class ReviewSeeder extends Seeder
 
         foreach ($users as $user) {
             Review::factory()->count(5)->create([
-                'user_id' => $user->id,
+                'author_id' => $user->id,
             ]);
         }
     }

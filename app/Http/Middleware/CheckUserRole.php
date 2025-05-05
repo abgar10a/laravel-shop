@@ -26,7 +26,7 @@ class CheckUserRole
                 return $next($request);
             }
 
-            return ResponseHelper::error('Invalid User Type', Response::HTTP_UNAUTHORIZED);
+            return ResponseHelper::error(__('user.invalid_user_type'), Response::HTTP_UNAUTHORIZED);
         }
 
         return ResponseHelper::error('User type not defined', Response::HTTP_UNAUTHORIZED);
